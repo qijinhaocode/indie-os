@@ -168,6 +168,10 @@
     "ownerPlaceholder": "your-github-username",
     "repo": "Repository",
     "repoPlaceholder": "my-awesome-project",
+    "vercelProject": "Vercel Project Name",
+    "vercelProjectPlaceholder": "my-project",
+    "vercelTeam": "Team ID (optional)",
+    "vercelTeamPlaceholder": "team_xxxx (leave blank for personal)",
     "cancel": "Cancel",
     "submit": "Add",
     "submitting": "Adding...",
@@ -175,5 +179,17 @@
     "deleteConfirm": "Remove this integration?",
     "enabled": "Enabled",
     "disabled": "Disabled"
+  },
+  "vercel": {
+    "latestDeployment": "Latest Deployment",
+    "framework": "Framework",
+    "state": {
+      "READY": "Ready",
+      "ERROR": "Error",
+      "BUILDING": "Building",
+      "QUEUED": "Queued",
+      "INITIALIZING": "Initializing",
+      "CANCELED": "Canceled"
+    }
   }
 }

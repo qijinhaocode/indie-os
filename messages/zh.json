@@ -168,6 +168,10 @@
     "ownerPlaceholder": "your-github-username",
     "repo": "仓库名",
     "repoPlaceholder": "my-awesome-project",
+    "vercelProject": "Vercel 项目名",
+    "vercelProjectPlaceholder": "my-project",
+    "vercelTeam": "Team ID（可选）",
+    "vercelTeamPlaceholder": "team_xxxx（个人账户留空）",
     "cancel": "取消",
     "submit": "添加",
     "submitting": "添加中...",
@@ -175,5 +179,17 @@
     "deleteConfirm": "确认删除这个集成？",
     "enabled": "已启用",
     "disabled": "已禁用"
+  },
+  "vercel": {
+    "latestDeployment": "最新部署",
+    "framework": "框架",
+    "state": {
+      "READY": "正常",
+      "ERROR": "失败",
+      "BUILDING": "构建中",
+      "QUEUED": "队列中",
+      "INITIALIZING": "初始化中",
+      "CANCELED": "已取消"
+    }
   }
 }
