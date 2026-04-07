@@ -14,6 +14,8 @@ import {
   Zap,
   Languages,
   Target,
+  Search,
+  BarChart2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { setLocale } from "@/actions/locale";
@@ -36,6 +38,7 @@ export function NavContent({ onLinkClick }: NavContentProps) {
     { href: "/revenue", label: t("revenue"), icon: DollarSign },
     { href: "/time", label: t("time"), icon: Clock },
     { href: "/goals", label: t("goals"), icon: Target },
+    { href: "/reports", label: t("reports"), icon: BarChart2 },
   ];
 
   function switchLocale() {
@@ -53,6 +56,20 @@ export function NavContent({ onLinkClick }: NavContentProps) {
         </div>
         <span className="font-semibold text-sm tracking-tight">indie-os</span>
       </div>
+
+      <button
+        onClick={() => {
+          const e = new KeyboardEvent("keydown", { key: "k", metaKey: true, bubbles: true });
+          document.dispatchEvent(e);
+        }}
+        className="mx-2 mt-2 flex items-center justify-between rounded-md border border-border px-3 py-1.5 text-xs text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+      >
+        <span className="flex items-center gap-1.5">
+          <Search className="h-3.5 w-3.5" />
+          Search…
+        </span>
+        <kbd className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-mono">⌘K</kbd>
+      </button>
 
       <nav className="flex-1 space-y-0.5 px-2 py-3 overflow-y-auto">
         {navItems.map((item) => {

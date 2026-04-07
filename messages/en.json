@@ -6,6 +6,7 @@
     "revenue": "Revenue",
     "time": "Time",
     "goals": "Goals",
+    "reports": "Reports",
     "settings": "Settings"
   },
   "overview": {
@@ -241,6 +242,8 @@
     "lemonsqueezyApiKeyDesc": "Used to fetch MRR and subscription data. Supports SaaS and digital product sales with built-in tax handling. Find it in Lemon Squeezy → Settings → API.",
     "paddleApiKey": "Paddle API Key",
     "paddleApiKeyDesc": "Used to fetch MRR and subscription data. Supports subscription SaaS with built-in tax handling. Find it in Paddle dashboard → Developer Tools → Authentication.",
+    "stripeWebhookSecret": "Stripe Webhook Secret",
+    "stripeWebhookSecretDesc": "Get this from Stripe → Webhooks after adding the endpoint. Used to verify real-time payment events. Webhook URL:",
     "plausibleApiKey": "Plausible API Key",
     "plausibleApiKeyDesc": "Create one in Plausible → Settings → API Keys. Used to read traffic stats.",
     "portfolio": {
@@ -454,6 +457,62 @@
     "pageviews30d": "Pageviews (30d)",
     "bounceRate": "Bounce rate",
     "visitDuration": "Avg. visit duration"
+  },
+  "reports": {
+    "title": "Analytics Reports",
+    "subtitle": "Multi-dimensional analysis of time investment and revenue",
+    "totalHours": "Total hours",
+    "activeProjects": "Active projects",
+    "totalRevenue": "Total MRR",
+    "avgRoi": "Avg ROI",
+    "timeAllocation": "Time Allocation",
+    "timeByProject": "Time by Project",
+    "revenueOverTime": "Revenue Over Time",
+    "projectComparison": "Project Comparison",
+    "noData": "No data yet",
+    "view": {
+      "monthly": "Monthly",
+      "weekly": "Weekly"
+    },
+    "table": {
+      "project": "Project",
+      "status": "Status",
+      "hours": "Hours",
+      "mrr": "MRR",
+      "roi": "ROI"
+    }
+  },
+  "cmdpalette": {
+    "placeholder": "Search pages, actions, or projects…",
+    "empty": "No results found",
+    "groups": {
+      "pages": "Pages",
+      "actions": "Quick actions",
+      "projects": "Projects",
+      "public": "Features"
+    },
+    "nav": {
+      "overview": "Overview",
+      "projects": "Projects",
+      "services": "Services",
+      "revenue": "Revenue",
+      "time": "Time",
+      "goals": "Goals",
+      "reports": "Reports",
+      "settings": "Settings"
+    },
+    "actions": {
+      "logRevenue": "Log revenue",
+      "logTime": "Log time",
+      "newProject": "New project"
+    },
+    "public": {
+      "links": "Public links (Portfolio / Changelog / Status)",
+      "export": "Export data",
+      "goals": "Goals & milestones",
+      "forecast": "Revenue forecast",
+      "insights": "AI insights"
+    }
   },
   "forecast": {
     "title": "MRR Forecast",

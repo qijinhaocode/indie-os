@@ -6,6 +6,7 @@
     "revenue": "收入",
     "time": "时间",
     "goals": "目标",
+    "reports": "报告",
     "settings": "设置"
   },
   "overview": {
@@ -241,6 +242,8 @@
     "lemonsqueezyApiKeyDesc": "用于拉取 MRR 和订阅数据。支持 SaaS、数字产品销售，自带税务处理。在 Lemon Squeezy 控制台 → Settings → API 获取。",
     "paddleApiKey": "Paddle API Key",
     "paddleApiKeyDesc": "用于拉取 MRR 和订阅数据。支持订阅制 SaaS，自带税务处理。在 Paddle 控制台 → Developer Tools → Authentication 获取。",
+    "stripeWebhookSecret": "Stripe Webhook Secret",
+    "stripeWebhookSecretDesc": "在 Stripe → Webhooks 中创建端点后获取，用于实时接收支付事件。Webhook 地址：",
     "plausibleApiKey": "Plausible API Key",
     "plausibleApiKeyDesc": "从 Plausible 设置 → API Keys 中创建，用于读取流量数据",
     "portfolio": {
@@ -454,6 +457,62 @@
     "pageviews30d": "30 天页面浏览",
     "bounceRate": "跳出率",
     "visitDuration": "平均访问时长"
+  },
+  "reports": {
+    "title": "分析报告",
+    "subtitle": "时间投入与收入的多维度分析",
+    "totalHours": "累计时间",
+    "activeProjects": "活跃项目",
+    "totalRevenue": "累计 MRR",
+    "avgRoi": "平均 ROI",
+    "timeAllocation": "时间分配",
+    "timeByProject": "各项目时间占比",
+    "revenueOverTime": "收入趋势",
+    "projectComparison": "项目对比",
+    "noData": "暂无数据",
+    "view": {
+      "monthly": "按月",
+      "weekly": "按周"
+    },
+    "table": {
+      "project": "项目",
+      "status": "状态",
+      "hours": "时间",
+      "mrr": "MRR",
+      "roi": "ROI"
+    }
+  },
+  "cmdpalette": {
+    "placeholder": "搜索页面、操作或项目…",
+    "empty": "未找到结果",
+    "groups": {
+      "pages": "页面",
+      "actions": "快速操作",
+      "projects": "项目",
+      "public": "功能"
+    },
+    "nav": {
+      "overview": "总览",
+      "projects": "项目",
+      "services": "服务",
+      "revenue": "收入",
+      "time": "时间",
+      "goals": "目标",
+      "reports": "报告",
+      "settings": "设置"
+    },
+    "actions": {
+      "logRevenue": "记录收入",
+      "logTime": "记录时间",
+      "newProject": "新建项目"
+    },
+    "public": {
+      "links": "公开链接（Portfolio / Changelog / Status）",
+      "export": "导出数据",
+      "goals": "目标与里程碑",
+      "forecast": "收入预测",
+      "insights": "AI 洞察"
+    }
   },
   "forecast": {
     "title": "MRR 预测",

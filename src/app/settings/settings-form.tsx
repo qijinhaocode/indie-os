@@ -23,6 +23,8 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
   const [lemonsqueezyApiKey, setLemonsqueezyApiKey] = useState("");
   const [paddleApiKey, setPaddleApiKey] = useState("");
   const [plausibleApiKey, setPlausibleApiKey] = useState("");
+  const [stripeWebhookSecret, setStripeWebhookSecret] = useState("");
+  const [webhookUrl, setWebhookUrlLocal] = useState("");
   const [openaiApiKey, setOpenaiApiKey] = useState("");
   const [webhookUrl, setWebhookUrl] = useState("");
   const [telegramBotToken, setTelegramBotToken] = useState("");
@@ -184,6 +186,7 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
     if (lemonsqueezyApiKey) body["lemonsqueezy_api_key"] = lemonsqueezyApiKey;
     if (paddleApiKey) body["paddle_api_key"] = paddleApiKey;
     if (plausibleApiKey) body["plausible_api_key"] = plausibleApiKey;
+    if (stripeWebhookSecret) body["stripe_webhook_secret"] = stripeWebhookSecret;
     if (openaiApiKey) body["openai_api_key"] = openaiApiKey;
     if (webhookUrl) body["notify_webhook_url"] = webhookUrl;
     if (telegramBotToken) body["notify_telegram_token"] = telegramBotToken;
@@ -211,6 +214,7 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
     setLemonsqueezyApiKey("");
     setPaddleApiKey("");
     setPlausibleApiKey("");
+    setStripeWebhookSecret("");
     setOpenaiApiKey("");
     setWebhookUrl("");
     setTelegramBotToken("");
@@ -221,7 +225,7 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
     router.refresh();
   }
 
-  const hasChanges = !!(githubToken || vercelToken || stripeSecretKey || revenuecatSecretKey || lemonsqueezyApiKey || paddleApiKey || plausibleApiKey || openaiApiKey || webhookUrl || telegramBotToken || telegramChatId || resendApiKey || digestEmail);
+  const hasChanges = !!(githubToken || vercelToken || stripeSecretKey || revenuecatSecretKey || lemonsqueezyApiKey || paddleApiKey || plausibleApiKey || stripeWebhookSecret || openaiApiKey || webhookUrl || telegramBotToken || telegramChatId || resendApiKey || digestEmail);
 
   async function handleSendDigest() {
     setSendingDigest(true);
@@ -295,6 +299,30 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
               onChange={(e) => setStripeSecretKey(e.target.value)}
               placeholder={savedKeys["stripe_secret_key"] ? "••••••••••••••••" : t("stripeSecretKeyPlaceholder")} />
             <p className="text-xs text-muted-foreground">{t("stripeSecretKeyDesc")}</p>
+          </div>
+
+          {/* Stripe Webhook Secret */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="stripe-webhook-secret" className="flex items-center gap-2">
+                {t("stripeWebhookSecret")}
+                {savedKeys["stripe_webhook_secret"] && <CheckCircle className="h-3.5 w-3.5 text-emerald-500" />}
+              </Label>
+              <a href="https://dashboard.stripe.com/webhooks"
+                target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-xs text-primary hover:underline">
+                {t("createToken")} <ExternalLink className="h-3 w-3" />
+              </a>
+            </div>
+            <Input id="stripe-webhook-secret" type="password" value={stripeWebhookSecret}
+              onChange={(e) => setStripeWebhookSecret(e.target.value)}
+              placeholder={savedKeys["stripe_webhook_secret"] ? "••••••••••••••••" : "whsec_..."} />
+            <p className="text-xs text-muted-foreground">
+              {t("stripeWebhookSecretDesc")}{" "}
+              <code className="text-xs bg-muted rounded px-1">
+                {typeof window !== "undefined" ? window.location.origin : ""}/api/webhooks/stripe
+              </code>
+            </p>
           </div>
 
           {/* RevenueCat Secret Key */}

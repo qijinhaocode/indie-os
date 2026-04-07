@@ -5,6 +5,7 @@ import "./globals.css";
 import { Sidebar } from "@/components/dashboard/sidebar";
 import { MobileHeader } from "@/components/dashboard/mobile-header";
 import { ThemeProvider } from "@/components/theme-provider";
+import { CommandPaletteWrapper } from "@/components/dashboard/command-palette-wrapper";
 
 export const metadata: Metadata = {
   title: "indie-os",
@@ -24,6 +25,7 @@ export default async function RootLayout({
       <body className="flex h-screen overflow-hidden bg-background">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <NextIntlClientProvider messages={messages}>
+            <CommandPaletteWrapper />
             {/* Desktop sidebar */}
             <Sidebar />
             {/* Mobile: column layout with header */}
