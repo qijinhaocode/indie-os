@@ -33,6 +33,18 @@
     "addProject": "Add Project",
     "noProjects": "No projects yet",
     "noProjectsDesc": "Add your first project to start tracking status, revenue, and time investment.",
+    "backToProjects": "← Back to Projects",
+    "notFound": "Project not found",
+    "editProject": "Edit Project",
+    "deleteProject": "Delete Project",
+    "deleteConfirm": "Confirm Delete",
+    "deleteConfirmDesc": "This action cannot be undone. All project data (services, revenue, time logs) will be permanently deleted.",
+    "cancel": "Cancel",
+    "confirmDelete": "Delete",
+    "saving": "Saving...",
+    "save": "Save",
+    "info": "Project Info",
+    "noDescription": "No description",
     "status": {
       "active": "Active",
       "paused": "Paused",
@@ -41,6 +53,7 @@
     },
     "form": {
       "title": "Add Project",
+      "editTitle": "Edit Project",
       "name": "Project Name",
       "namePlaceholder": "My Awesome SaaS",
       "description": "Description",
@@ -54,25 +67,113 @@
       "domainPlaceholder": "myapp.com",
       "cancel": "Cancel",
       "submit": "Add Project",
-      "submitting": "Adding..."
+      "submitEdit": "Save Changes",
+      "submitting": "Adding...",
+      "saving": "Saving..."
     }
-  },
-  "services": {
-    "title": "Services",
-    "subtitle": "Infrastructure health monitoring",
-    "comingSoon": "Coming in Phase 1",
-    "comingSoonDesc": "Service health monitoring will be available soon. You'll be able to track Frontend, DB, Cron Jobs, and third-party service status."
   },
   "revenue": {
     "title": "Revenue",
     "subtitle": "MRR & revenue tracking",
-    "comingSoon": "Coming Soon",
-    "comingSoonDesc": "Track MRR, one-time revenue, and refunds for each project. Calculate ROI based on time invested."
+    "addEntry": "Log Revenue",
+    "noEntries": "No revenue entries yet",
+    "noEntriesDesc": "Start logging revenue for your projects.",
+    "totalMRR": "Total MRR",
+    "allProjects": "All Projects",
+    "type": {
+      "mrr": "MRR",
+      "one_time": "One-time",
+      "refund": "Refund"
+    },
+    "form": {
+      "title": "Log Revenue",
+      "project": "Project",
+      "selectProject": "Select a project",
+      "amount": "Amount",
+      "currency": "Currency",
+      "type": "Type",
+      "source": "Source",
+      "sourcePlaceholder": "Stripe, Lemon Squeezy...",
+      "date": "Date",
+      "cancel": "Cancel",
+      "submit": "Log",
+      "submitting": "Logging..."
+    }
   },
   "time": {
     "title": "Time",
     "subtitle": "Attention & time tracking",
-    "comingSoon": "Coming Soon",
-    "comingSoonDesc": "Log time spent on each project and correlate with revenue to understand your real ROI per project."
+    "logTime": "Log Time",
+    "noLogs": "No time logs yet",
+    "noLogsDesc": "Start logging time spent on your projects.",
+    "totalThisMonth": "This Month",
+    "allProjects": "All Projects",
+    "form": {
+      "title": "Log Time",
+      "project": "Project",
+      "selectProject": "Select a project",
+      "hours": "Hours",
+      "minutes": "Minutes",
+      "description": "Note",
+      "descriptionPlaceholder": "What did you work on?",
+      "date": "Date",
+      "cancel": "Cancel",
+      "submit": "Log",
+      "submitting": "Logging..."
+    }
+  },
+  "services": {
+    "title": "Services",
+    "subtitle": "Integrations & service status",
+    "noIntegrations": "No integrations yet",
+    "noIntegrationsDesc": "Add GitHub, Vercel and other integrations from each project's detail page.",
+    "sync": "Sync",
+    "syncing": "Syncing...",
+    "lastSynced": "Last synced",
+    "never": "Never",
+    "viewRepo": "View repo",
+    "github": {
+      "latestCommit": "Latest Commit",
+      "ciStatus": "CI Status",
+      "stars": "Stars",
+      "openIssues": "Open Issues",
+      "branch": "Branch",
+      "success": "Passing",
+      "failure": "Failing",
+      "pending": "In Progress",
+      "noRuns": "No CI runs"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Global configuration & API Keys",
+    "githubToken": "GitHub Token",
+    "githubTokenDesc": "Used to access repo info, CI status, and commit history. Requires repo and workflow scopes.",
+    "githubTokenPlaceholder": "ghp_xxxxxxxxxxxx",
+    "createToken": "Create Token →",
+    "vercelToken": "Vercel Token",
+    "vercelTokenDesc": "Used to fetch deployment status and project info.",
+    "vercelTokenPlaceholder": "xxxxxxxxxxxxxxxxxxxxxxxx",
+    "save": "Save",
+    "saving": "Saving...",
+    "saved": "Saved",
+    "apiKeys": "API Keys",
+    "danger": "Note: API Keys are stored in plain text in your local database. Make sure your indie-os instance is not publicly accessible."
+  },
+  "integrations": {
+    "add": "Add Integration",
+    "github": "GitHub",
+    "vercel": "Vercel",
+    "owner": "Username / Org",
+    "ownerPlaceholder": "your-github-username",
+    "repo": "Repository",
+    "repoPlaceholder": "my-awesome-project",
+    "cancel": "Cancel",
+    "submit": "Add",
+    "submitting": "Adding...",
+    "delete": "Remove integration",
+    "deleteConfirm": "Remove this integration?",
+    "enabled": "Enabled",
+    "disabled": "Disabled"
   }
 }

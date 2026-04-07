@@ -62,8 +62,29 @@ export const timeLogs = sqliteTable("time_logs", {
   createdAt: text("created_at").default(sql`(datetime('now'))`),
 });
 
+export const appSettings = sqliteTable("app_settings", {
+  key: text("key").primaryKey(),
+  value: text("value").notNull(),
+  updatedAt: text("updated_at").default(sql`(datetime('now'))`),
+});
+
+export const integrations = sqliteTable("integrations", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  projectId: integer("project_id")
+    .notNull()
+    .references(() => projects.id, { onDelete: "cascade" }),
+  type: text("type", { enum: ["github", "vercel", "stripe"] }).notNull(),
+  config: text("config").notNull().default("{}"),
+  cachedData: text("cached_data"),
+  lastSyncedAt: text("last_synced_at"),
+  enabled: integer("enabled", { mode: "boolean" }).notNull().default(true),
+  createdAt: text("created_at").default(sql`(datetime('now'))`),
+});
+
 export type Project = typeof projects.$inferSelect;
 export type NewProject = typeof projects.$inferInsert;
 export type Service = typeof services.$inferSelect;
 export type RevenueEntry = typeof revenueEntries.$inferSelect;
 export type TimeLog = typeof timeLogs.$inferSelect;
+export type Integration = typeof integrations.$inferSelect;
+export type AppSetting = typeof appSettings.$inferSelect;
