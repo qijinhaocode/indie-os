@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle, ExternalLink, Copy, RefreshCw, Bell } from "lucide-react";
+import { CheckCircle, ExternalLink, Copy, RefreshCw, Bell, Radio } from "lucide-react";
 
 interface SettingsFormProps {
   savedKeys: Record<string, boolean>;
@@ -28,6 +28,9 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
   const [cronSecret, setCronSecret] = useState<string | null>(null);
   const [cronCopied, setCronCopied] = useState(false);
   const [cronLoading, setCronLoading] = useState(false);
+  const [statusToken, setStatusToken] = useState<string | null>(null);
+  const [statusCopied, setStatusCopied] = useState(false);
+  const [statusLoading, setStatusLoading] = useState(false);
 
   const loadCronSecret = useCallback(async () => {
     setCronLoading(true);
@@ -40,9 +43,43 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
     }
   }, []);
 
+  const loadStatusToken = useCallback(async () => {
+    setStatusLoading(true);
+    try {
+      const res = await fetch("/api/status-token");
+      const data = await res.json() as { token: string };
+      setStatusToken(data.token);
+    } finally {
+      setStatusLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     loadCronSecret();
-  }, [loadCronSecret]);
+    loadStatusToken();
+  }, [loadCronSecret, loadStatusToken]);
+
+  const statusUrl = statusToken
+    ? `${typeof window !== "undefined" ? window.location.origin : ""}/status/${statusToken}`
+    : "";
+
+  async function handleCopyStatusUrl() {
+    if (!statusUrl) return;
+    await navigator.clipboard.writeText(statusUrl);
+    setStatusCopied(true);
+    setTimeout(() => setStatusCopied(false), 2000);
+  }
+
+  async function handleRegenStatusToken() {
+    setStatusLoading(true);
+    try {
+      const res = await fetch("/api/status-token", { method: "POST" });
+      const data = await res.json() as { token: string };
+      setStatusToken(data.token);
+    } finally {
+      setStatusLoading(false);
+    }
+  }
 
   const cronUrl = cronSecret
     ? `${typeof window !== "undefined" ? window.location.origin : ""}/api/cron?secret=${cronSecret}`
@@ -229,6 +266,43 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
           <Button onClick={handleSave} disabled={saving || !hasChanges}>
             {saved ? t("saved") : saving ? t("saving") : t("save")}
           </Button>
+        </CardContent>
+      </Card>
+
+      {/* Status Page */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <Radio className="h-4 w-4" />
+            {t("statusPage.title")}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-muted-foreground">{t("statusPage.desc")}</p>
+
+          <div className="space-y-2">
+            <Label>{t("statusPage.url")}</Label>
+            <div className="flex gap-2">
+              <Input readOnly value={statusLoading ? t("cron.loading") : statusUrl}
+                className="font-mono text-xs" />
+              <Button variant="outline" size="icon" onClick={handleCopyStatusUrl} disabled={!statusUrl}>
+                {statusCopied ? <CheckCircle className="h-4 w-4 text-emerald-500" /> : <Copy className="h-4 w-4" />}
+              </Button>
+              <Button variant="outline" size="icon" onClick={handleRegenStatusToken} disabled={statusLoading}
+                title={t("statusPage.regenerate")}>
+                <RefreshCw className={`h-4 w-4 ${statusLoading ? "animate-spin" : ""}`} />
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">{t("statusPage.urlDesc")}</p>
+          </div>
+
+          {statusUrl && (
+            <a href={`/status/${statusToken}`} target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs text-primary hover:underline">
+              <ExternalLink className="h-3 w-3" />
+              {t("statusPage.preview")}
+            </a>
+          )}
         </CardContent>
       </Card>
 

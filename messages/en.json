@@ -189,6 +189,14 @@
     "stripeSecretKeyPlaceholder": "sk_live_xxxxxxxxxxxx",
     "openaiApiKey": "OpenAI API Key",
     "openaiApiKeyDesc": "Powers the AI Copilot. Uses gpt-4o-mini — very low cost per analysis.",
+    "statusPage": {
+      "title": "Public Status Page",
+      "desc": "Share this URL so users can check the real-time health of all your HTTP-monitored services. No login required. Regenerating the token invalidates the old link.",
+      "url": "Status Page URL",
+      "urlDesc": "This URL contains a token — share it with your users or link it in your product docs.",
+      "preview": "Preview status page",
+      "regenerate": "Regenerate token"
+    },
     "cron": {
       "title": "Auto-sync (Cron)",
       "desc": "Add the URL below to any cron service (e.g. cron-job.org). Each hit automatically syncs all your integrations.",

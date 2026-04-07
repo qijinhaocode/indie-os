@@ -189,6 +189,14 @@
     "stripeSecretKeyPlaceholder": "sk_live_xxxxxxxxxxxx",
     "openaiApiKey": "OpenAI API Key",
     "openaiApiKeyDesc": "用于 AI Copilot 功能，分析你的项目数据并生成洞察建议。使用 gpt-4o-mini，成本极低。",
+    "statusPage": {
+      "title": "公开状态页",
+      "desc": "分享此 URL 让用户看到你所有 HTTP 探针的实时状态，无需登录。刷新 token 会使旧链接失效。",
+      "url": "状态页 URL",
+      "urlDesc": "URL 包含 token，分享给你的用户或写进产品文档。",
+      "preview": "预览状态页",
+      "regenerate": "重新生成 Token"
+    },
     "cron": {
       "title": "自动同步 (Cron)",
       "desc": "将以下 URL 配置到任意 cron 服务（如 cron-job.org），每次访问会自动同步所有集成数据。",
