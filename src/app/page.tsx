@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { projects, revenueEntries, timeLogs } from "@/db/schema";
+import { projects, revenueEntries, timeLogs, integrations, appSettings } from "@/db/schema";
 import { desc, eq, sql } from "drizzle-orm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,9 +11,16 @@ import {
   Activity,
   TrendingUp,
   AlertCircle,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+import { AiCopilot } from "@/components/dashboard/ai-copilot";
+
+interface HttpCachedData {
+  status: "up" | "down" | "degraded";
+}
 
 async function getStats() {
   const allProjects = await db.select().from(projects).orderBy(desc(projects.updatedAt));
@@ -33,7 +40,29 @@ async function getStats() {
     .where(sql`${timeLogs.loggedAt} >= ${startOfMonth}`);
   const monthlyMinutes = monthlyTimeResult[0]?.total ?? 0;
 
-  return { projects: allProjects, totalProjects: allProjects.length, activeCount, totalMRR, monthlyMinutes };
+  const httpProbes = await db
+    .select({ id: integrations.id, projectId: integrations.projectId, cachedData: integrations.cachedData })
+    .from(integrations)
+    .where(eq(integrations.type, "http"));
+
+  const probesSummary = httpProbes.map((p) => ({
+    projectId: p.projectId,
+    status: p.cachedData ? (JSON.parse(p.cachedData) as HttpCachedData).status : null,
+  }));
+
+  const hasOpenAiKey = !!(await db.query.appSettings.findFirst({
+    where: eq(appSettings.key, "openai_api_key"),
+  }))?.value;
+
+  return {
+    projects: allProjects,
+    totalProjects: allProjects.length,
+    activeCount,
+    totalMRR,
+    monthlyMinutes,
+    probesSummary,
+    hasOpenAiKey,
+  };
 }
 
 const statusVariant = {
@@ -46,8 +75,10 @@ const statusVariant = {
 export default async function DashboardPage() {
   const t = await getTranslations("overview");
   const tp = await getTranslations("projects");
-  const { projects: allProjects, totalProjects, activeCount, totalMRR, monthlyMinutes } = await getStats();
+  const { projects: allProjects, totalProjects, activeCount, totalMRR, monthlyMinutes, probesSummary, hasOpenAiKey } = await getStats();
   const recentProjects = allProjects.slice(0, 5);
+  const upCount = probesSummary.filter((p) => p.status === "up").length;
+  const downCount = probesSummary.filter((p) => p.status === "down" || p.status === "degraded").length;
 
   return (
     <div className="p-6 space-y-6">
@@ -157,20 +188,51 @@ export default async function DashboardPage() {
         </Card>
 
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-base">{t("serviceHealth")}</CardTitle>
+            <Link href="/services" className="text-xs text-primary hover:underline">{t("viewAll")}</Link>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col items-center justify-center py-8 text-center">
-              <Activity className="h-8 w-8 text-muted-foreground mb-2" />
-              <p className="text-sm text-muted-foreground">{t("noServices")}</p>
-              <Link href="/services" className="text-sm text-primary hover:underline mt-1">
-                {t("addServices")}
-              </Link>
-            </div>
+            {probesSummary.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <Activity className="h-8 w-8 text-muted-foreground mb-2" />
+                <p className="text-sm text-muted-foreground">{t("noServices")}</p>
+                <Link href="/projects" className="text-sm text-primary hover:underline mt-1">
+                  {t("addServices")}
+                </Link>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="h-5 w-5 text-emerald-500" />
+                    <div>
+                      <p className="text-2xl font-bold">{upCount}</p>
+                      <p className="text-xs text-muted-foreground">{t("servicesUp")}</p>
+                    </div>
+                  </div>
+                  {downCount > 0 && (
+                    <div className="flex items-center gap-2">
+                      <XCircle className="h-5 w-5 text-red-500" />
+                      <div>
+                        <p className="text-2xl font-bold text-destructive">{downCount}</p>
+                        <p className="text-xs text-muted-foreground">{t("servicesDown")}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                {downCount > 0 && (
+                  <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-3 py-2">
+                    <p className="text-xs text-destructive font-medium">{t("serviceAlert")}</p>
+                  </div>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
+
+      <AiCopilot hasOpenAiKey={hasOpenAiKey} />
     </div>
   );
 }

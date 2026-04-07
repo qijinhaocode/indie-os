@@ -24,8 +24,12 @@
     "serviceHealth": "服务健康",
     "noProjects": "暂无项目",
     "addFirstProject": "添加你的第一个项目 →",
-    "noServices": "暂无服务配置",
-    "addServices": "添加需要监控的服务 →"
+    "noServices": "还没有 HTTP 探针",
+    "addServices": "前往项目页面添加探针",
+    "viewAll": "查看全部",
+    "servicesUp": "服务正常",
+    "servicesDown": "服务异常",
+    "serviceAlert": "部分服务不可达，请立即检查"
   },
   "projects": {
     "title": "项目",
@@ -157,6 +161,19 @@
     "stripeSecretKey": "Stripe Secret Key",
     "stripeSecretKeyDesc": "用于拉取 MRR、订阅和收入数据。使用受限密钥（Restricted Key）仅授予 read 权限更安全。",
     "stripeSecretKeyPlaceholder": "sk_live_xxxxxxxxxxxx",
+    "openaiApiKey": "OpenAI API Key",
+    "openaiApiKeyDesc": "用于 AI Copilot 功能，分析你的项目数据并生成洞察建议。使用 gpt-4o-mini，成本极低。",
+    "cron": {
+      "title": "自动同步 (Cron)",
+      "desc": "将以下 URL 配置到任意 cron 服务（如 cron-job.org），每次访问会自动同步所有集成数据。",
+      "url": "Cron URL",
+      "urlDesc": "URL 中包含 secret 参数，任何人访问此 URL 都会触发同步，请勿公开分享。",
+      "loading": "生成中...",
+      "howTo": "配置步骤",
+      "step1": " 注册免费账号",
+      "step2": "粘贴上方 URL，选择频率（建议每 30 分钟或 1 小时）",
+      "step3": "保存后 Cron 就会自动帮你同步所有集成"
+    },
     "save": "保存",
     "saving": "保存中...",
     "saved": "已保存",
@@ -182,6 +199,18 @@
     "deleteConfirm": "确认删除这个集成？",
     "enabled": "已启用",
     "disabled": "已禁用"
+  },
+  "ai": {
+    "title": "AI Copilot",
+    "generate": "生成洞察",
+    "refresh": "重新分析",
+    "generating": "分析中...",
+    "analyzing": "正在分析你的项目数据...",
+    "noKey": "请先在 Settings 页面配置 OpenAI API Key 才能使用 AI Copilot。",
+    "goToSettings": "前往 Settings →",
+    "prompt": "点击「生成洞察」，AI 将基于你的真实数据给出决策建议。",
+    "snapshotProjects": "{count} 个项目",
+    "thisMonth": "本月"
   },
   "http": {
     "title": "HTTP 健康探针",

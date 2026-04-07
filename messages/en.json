@@ -24,8 +24,12 @@
     "serviceHealth": "Service Health",
     "noProjects": "No projects yet.",
     "addFirstProject": "Add your first project →",
-    "noServices": "No services configured.",
-    "addServices": "Add services to monitor →"
+    "noServices": "No HTTP probes yet",
+    "addServices": "Go to a project to add probes",
+    "viewAll": "View all",
+    "servicesUp": "services up",
+    "servicesDown": "services down",
+    "serviceAlert": "Some services are unreachable — check immediately"
   },
   "projects": {
     "title": "Projects",
@@ -157,6 +161,19 @@
     "stripeSecretKey": "Stripe Secret Key",
     "stripeSecretKeyDesc": "Used to fetch MRR, subscriptions, and revenue. Use a Restricted Key with read-only permissions for security.",
     "stripeSecretKeyPlaceholder": "sk_live_xxxxxxxxxxxx",
+    "openaiApiKey": "OpenAI API Key",
+    "openaiApiKeyDesc": "Powers the AI Copilot. Uses gpt-4o-mini — very low cost per analysis.",
+    "cron": {
+      "title": "Auto-sync (Cron)",
+      "desc": "Add the URL below to any cron service (e.g. cron-job.org). Each hit automatically syncs all your integrations.",
+      "url": "Cron URL",
+      "urlDesc": "The URL includes a secret token. Do not share it publicly.",
+      "loading": "Generating...",
+      "howTo": "Setup steps",
+      "step1": " — register a free account",
+      "step2": "Paste the URL above and choose a frequency (every 30 min or 1 hour recommended)",
+      "step3": "Save — your integrations will sync automatically from now on"
+    },
     "save": "Save",
     "saving": "Saving...",
     "saved": "Saved",
@@ -182,6 +199,18 @@
     "deleteConfirm": "Remove this integration?",
     "enabled": "Enabled",
     "disabled": "Disabled"
+  },
+  "ai": {
+    "title": "AI Copilot",
+    "generate": "Generate Insights",
+    "refresh": "Re-analyze",
+    "generating": "Analyzing...",
+    "analyzing": "Analyzing your project data...",
+    "noKey": "Add an OpenAI API Key in Settings to enable AI Copilot.",
+    "goToSettings": "Go to Settings →",
+    "prompt": "Click \"Generate Insights\" to get AI-powered recommendations based on your real data.",
+    "snapshotProjects": "{count} projects",
+    "thisMonth": "this month"
   },
   "http": {
     "title": "HTTP Health Probe",
