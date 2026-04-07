@@ -5,9 +5,10 @@ import { getTranslations } from "next-intl/server";
 import { formatCurrency } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { DollarSign, Plus, Trash2 } from "lucide-react";
+import { DollarSign, Plus, Download } from "lucide-react";
 import { LogRevenueDialog } from "./log-revenue-dialog";
 import { DeleteEntryButton } from "./delete-entry-button";
+import Link from "next/link";
 
 const typeVariant = {
   mrr: "success" as const,
@@ -42,18 +43,30 @@ export default async function RevenuePage() {
   const totalMRR = mrrResult[0]?.total ?? 0;
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="p-4 sm:p-6 space-y-6">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
           <p className="text-sm text-muted-foreground mt-1">{t("subtitle")}</p>
         </div>
-        <LogRevenueDialog projects={allProjects}>
-          <button className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 transition-colors">
-            <Plus className="h-4 w-4" />
-            {t("addEntry")}
-          </button>
-        </LogRevenueDialog>
+        <div className="flex items-center gap-2">
+          {entries.length > 0 && (
+            <Link
+              href="/api/export?type=revenue&format=csv"
+              className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+            >
+              <Download className="h-4 w-4" />
+              <span className="hidden sm:inline">{t("exportCsv")}</span>
+            </Link>
+          )}
+          <LogRevenueDialog projects={allProjects}>
+            <button className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 transition-colors">
+              <Plus className="h-4 w-4" />
+              <span className="hidden sm:inline">{t("addEntry")}</span>
+              <span className="sm:hidden">{t("add")}</span>
+            </button>
+          </LogRevenueDialog>
+        </div>
       </div>
 
       <Card>
@@ -73,25 +86,15 @@ export default async function RevenuePage() {
           <p className="text-sm text-muted-foreground mt-1">{t("noEntriesDesc")}</p>
         </div>
       ) : (
-        <div className="rounded-xl border border-border overflow-hidden">
-          <table className="w-full text-sm">
+        <div className="rounded-xl border border-border overflow-x-auto">
+          <table className="w-full text-sm min-w-[560px]">
             <thead>
               <tr className="border-b border-border bg-muted/40">
-                <th className="text-left px-4 py-3 font-medium text-muted-foreground">
-                  {t("form.project")}
-                </th>
-                <th className="text-left px-4 py-3 font-medium text-muted-foreground">
-                  {t("form.amount")}
-                </th>
-                <th className="text-left px-4 py-3 font-medium text-muted-foreground">
-                  {t("form.type")}
-                </th>
-                <th className="text-left px-4 py-3 font-medium text-muted-foreground">
-                  {t("form.source")}
-                </th>
-                <th className="text-left px-4 py-3 font-medium text-muted-foreground">
-                  {t("form.date")}
-                </th>
+                <th className="text-left px-4 py-3 font-medium text-muted-foreground">{t("form.project")}</th>
+                <th className="text-left px-4 py-3 font-medium text-muted-foreground">{t("form.amount")}</th>
+                <th className="text-left px-4 py-3 font-medium text-muted-foreground">{t("form.type")}</th>
+                <th className="text-left px-4 py-3 font-medium text-muted-foreground hidden sm:table-cell">{t("form.source")}</th>
+                <th className="text-left px-4 py-3 font-medium text-muted-foreground">{t("form.date")}</th>
                 <th className="px-4 py-3" />
               </tr>
             </thead>
@@ -105,11 +108,9 @@ export default async function RevenuePage() {
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    <Badge variant={typeVariant[entry.type]}>
-                      {t(`type.${entry.type}`)}
-                    </Badge>
+                    <Badge variant={typeVariant[entry.type]}>{t(`type.${entry.type}`)}</Badge>
                   </td>
-                  <td className="px-4 py-3 text-muted-foreground">{entry.source ?? "—"}</td>
+                  <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell">{entry.source ?? "—"}</td>
                   <td className="px-4 py-3 text-muted-foreground">{entry.recordedAt}</td>
                   <td className="px-4 py-3">
                     <DeleteEntryButton id={entry.id} endpoint="revenue" />

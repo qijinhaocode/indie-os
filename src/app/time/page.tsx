@@ -4,9 +4,10 @@ import { sql, desc, eq } from "drizzle-orm";
 import { getTranslations } from "next-intl/server";
 import { formatMinutes } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock, Plus } from "lucide-react";
+import { Clock, Plus, Download } from "lucide-react";
 import { LogTimeDialog } from "./log-time-dialog";
 import { DeleteEntryButton } from "../revenue/delete-entry-button";
+import Link from "next/link";
 
 export default async function TimePage() {
   const t = await getTranslations("time");
@@ -35,18 +36,30 @@ export default async function TimePage() {
   const monthlyMinutes = monthlyResult[0]?.total ?? 0;
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="p-4 sm:p-6 space-y-6">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
           <p className="text-sm text-muted-foreground mt-1">{t("subtitle")}</p>
         </div>
-        <LogTimeDialog projects={allProjects}>
-          <button className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 transition-colors">
-            <Plus className="h-4 w-4" />
-            {t("logTime")}
-          </button>
-        </LogTimeDialog>
+        <div className="flex items-center gap-2">
+          {logs.length > 0 && (
+            <Link
+              href="/api/export?type=time&format=csv"
+              className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+            >
+              <Download className="h-4 w-4" />
+              <span className="hidden sm:inline">{t("exportCsv")}</span>
+            </Link>
+          )}
+          <LogTimeDialog projects={allProjects}>
+            <button className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90 transition-colors">
+              <Plus className="h-4 w-4" />
+              <span className="hidden sm:inline">{t("logTime")}</span>
+              <span className="sm:hidden">{t("log")}</span>
+            </button>
+          </LogTimeDialog>
+        </div>
       </div>
 
       <Card>
@@ -66,13 +79,13 @@ export default async function TimePage() {
           <p className="text-sm text-muted-foreground mt-1">{t("noLogsDesc")}</p>
         </div>
       ) : (
-        <div className="rounded-xl border border-border overflow-hidden">
-          <table className="w-full text-sm">
+        <div className="rounded-xl border border-border overflow-x-auto">
+          <table className="w-full text-sm min-w-[480px]">
             <thead>
               <tr className="border-b border-border bg-muted/40">
                 <th className="text-left px-4 py-3 font-medium text-muted-foreground">{t("form.project")}</th>
                 <th className="text-left px-4 py-3 font-medium text-muted-foreground">{t("form.hours")}</th>
-                <th className="text-left px-4 py-3 font-medium text-muted-foreground">{t("form.description")}</th>
+                <th className="text-left px-4 py-3 font-medium text-muted-foreground hidden sm:table-cell">{t("form.description")}</th>
                 <th className="text-left px-4 py-3 font-medium text-muted-foreground">{t("form.date")}</th>
                 <th className="px-4 py-3" />
               </tr>
@@ -82,7 +95,7 @@ export default async function TimePage() {
                 <tr key={log.id} className="border-b border-border last:border-0 hover:bg-muted/20 transition-colors">
                   <td className="px-4 py-3 font-medium">{log.projectName}</td>
                   <td className="px-4 py-3 font-mono">{formatMinutes(log.minutes)}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{log.description ?? "—"}</td>
+                  <td className="px-4 py-3 text-muted-foreground hidden sm:table-cell max-w-48 truncate">{log.description ?? "—"}</td>
                   <td className="px-4 py-3 text-muted-foreground">{log.loggedAt}</td>
                   <td className="px-4 py-3">
                     <DeleteEntryButton id={log.id} endpoint="time-logs" />

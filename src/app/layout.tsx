@@ -3,6 +3,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getLocale } from "next-intl/server";
 import "./globals.css";
 import { Sidebar } from "@/components/dashboard/sidebar";
+import { MobileHeader } from "@/components/dashboard/mobile-header";
 
 export const metadata: Metadata = {
   title: "indie-os",
@@ -21,8 +22,13 @@ export default async function RootLayout({
     <html lang={locale}>
       <body className="flex h-screen overflow-hidden bg-background">
         <NextIntlClientProvider messages={messages}>
+          {/* Desktop sidebar */}
           <Sidebar />
-          <main className="flex-1 overflow-y-auto">{children}</main>
+          {/* Mobile: column layout with header */}
+          <div className="flex flex-1 flex-col overflow-hidden min-w-0">
+            <MobileHeader />
+            <main className="flex-1 overflow-y-auto">{children}</main>
+          </div>
         </NextIntlClientProvider>
       </body>
     </html>
