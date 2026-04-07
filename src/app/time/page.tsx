@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Clock, Plus, Download } from "lucide-react";
 import { LogTimeDialog } from "./log-time-dialog";
 import { DeleteEntryButton } from "../revenue/delete-entry-button";
+import { LiveTimer } from "@/components/dashboard/live-timer";
 import Link from "next/link";
 
 export default async function TimePage() {
@@ -61,6 +62,8 @@ export default async function TimePage() {
           </LogTimeDialog>
         </div>
       </div>
+
+      <LiveTimer projects={allProjects} />
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">

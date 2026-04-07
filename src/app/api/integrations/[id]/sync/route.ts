@@ -5,6 +5,93 @@ import { eq, sql } from "drizzle-orm";
 import Stripe from "stripe";
 import { sendDownAlert } from "@/lib/notify";
 
+interface PaddleData {
+  mrr: number;
+  activeSubscriptions: number;
+  totalTransactions: number;
+  currency: string;
+  syncedAt: string;
+}
+
+async function syncPaddle(
+  integration: { id: number; config: string; projectId: number },
+  apiKey: string
+): Promise<PaddleData> {
+  const config = JSON.parse(integration.config) as {
+    vendorId?: string;
+    sandbox?: boolean;
+  };
+
+  const base = config.sandbox
+    ? "https://sandbox-api.paddle.com"
+    : "https://api.paddle.com";
+
+  const headers = {
+    Authorization: `Bearer ${apiKey}`,
+    "Content-Type": "application/json",
+  };
+
+  // Fetch active subscriptions
+  const subRes = await fetch(
+    `${base}/subscriptions?status=active&per_page=200`,
+    { headers, next: { revalidate: 0 } }
+  );
+  if (!subRes.ok) {
+    const text = await subRes.text();
+    throw new Error(`Paddle API error ${subRes.status}: ${text}`);
+  }
+  const subJson = (await subRes.json()) as {
+    data?: Array<{
+      billing_details?: { amount?: string };
+      currency_code?: string;
+      billing_cycle?: { interval?: string };
+      recurring_transaction_details?: Array<{ totals?: { subtotal?: string } }>;
+    }>;
+    meta?: { pagination?: { total?: number } };
+  };
+
+  const subs = subJson.data ?? [];
+  let mrrCents = 0;
+  const currency = subs[0]?.currency_code ?? "USD";
+
+  for (const sub of subs) {
+    const subtotal = parseInt(
+      sub.recurring_transaction_details?.[0]?.totals?.subtotal ?? "0"
+    );
+    const interval = sub.billing_cycle?.interval;
+    if (interval === "month") {
+      mrrCents += subtotal;
+    } else if (interval === "year") {
+      mrrCents += Math.round(subtotal / 12);
+    }
+  }
+
+  // Fetch recent transactions count
+  let totalTransactions = 0;
+  try {
+    const txRes = await fetch(`${base}/transactions?per_page=1`, {
+      headers,
+      next: { revalidate: 0 },
+    });
+    if (txRes.ok) {
+      const txJson = (await txRes.json()) as {
+        meta?: { pagination?: { total?: number } };
+      };
+      totalTransactions = txJson.meta?.pagination?.total ?? 0;
+    }
+  } catch {
+    // non-critical
+  }
+
+  return {
+    mrr: mrrCents / 100,
+    activeSubscriptions: subs.length,
+    totalTransactions,
+    currency,
+    syncedAt: new Date().toISOString(),
+  };
+}
+
 interface LemonSqueezyData {
   mrr: number; // USD (cents already converted to dollars)
   activeSubscriptions: number;
@@ -445,6 +532,40 @@ export async function POST(
             currency: stripeData.currency.toUpperCase(),
             type: "mrr",
             source: "stripe-auto",
+            recordedAt: today,
+          });
+        }
+      }
+    } else if (integration.type === "paddle") {
+      const tokenRow = await db.query.appSettings.findFirst({
+        where: eq(appSettings.key, "paddle_api_key"),
+      });
+      if (!tokenRow?.value) {
+        return NextResponse.json(
+          { error: "Paddle API key not configured. Go to Settings." },
+          { status: 400 }
+        );
+      }
+      cachedData = await syncPaddle(integration, tokenRow.value);
+
+      const paddleData = cachedData as PaddleData;
+      if (paddleData.mrr > 0) {
+        const today = new Date().toISOString().split("T")[0];
+        const existing = await db.query.revenueEntries.findFirst({
+          where: (r, { and, eq: eqF }) =>
+            and(
+              eqF(r.projectId, integration.projectId),
+              eqF(r.source, "paddle-auto"),
+              eqF(r.recordedAt, today)
+            ),
+        });
+        if (!existing) {
+          await db.insert(revenueEntries).values({
+            projectId: integration.projectId,
+            amount: paddleData.mrr,
+            currency: paddleData.currency,
+            type: "mrr",
+            source: "paddle-auto",
             recordedAt: today,
           });
         }

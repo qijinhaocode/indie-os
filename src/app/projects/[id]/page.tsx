@@ -16,6 +16,7 @@ import { HttpProbeIntegration } from "@/components/dashboard/http-probe-integrat
 import { StripeIntegration } from "@/components/dashboard/stripe-integration";
 import { RevenueCatIntegration } from "@/components/dashboard/revenuecat-integration";
 import { LemonSqueezyIntegration } from "@/components/dashboard/lemonsqueezy-integration";
+import { PaddleIntegration } from "@/components/dashboard/paddle-integration";
 import { KpiTracker } from "@/components/dashboard/kpi-tracker";
 import { MilestoneLog } from "@/components/dashboard/milestone-log";
 import { ShareButton } from "./share-button";
@@ -318,6 +319,7 @@ export default async function ProjectDetailPage({
         <StripeIntegration projectId={project.id} integrations={projectIntegrations} />
         <RevenueCatIntegration projectId={project.id} integrations={projectIntegrations} />
         <LemonSqueezyIntegration projectId={project.id} integrations={projectIntegrations} />
+        <PaddleIntegration projectId={project.id} integrations={projectIntegrations} />
         <KpiTracker projectId={project.id} metrics={metricsWithValues} />
         <MilestoneLog projectId={project.id} milestones={projectMilestones} />
       </div>

@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { db } from "@/db";
 import { appSettings } from "@/db/schema";
 import { SettingsForm } from "./settings-form";
+import { CsvImporter } from "@/components/dashboard/csv-importer";
 import Link from "next/link";
 import { Download } from "lucide-react";
 
@@ -35,6 +36,8 @@ export default async function SettingsPage() {
       </div>
 
       <SettingsForm savedKeys={saved} />
+
+      <CsvImporter />
     </div>
   );
 }

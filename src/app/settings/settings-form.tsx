@@ -21,6 +21,7 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
   const [stripeSecretKey, setStripeSecretKey] = useState("");
   const [revenuecatSecretKey, setRevenuecatSecretKey] = useState("");
   const [lemonsqueezyApiKey, setLemonsqueezyApiKey] = useState("");
+  const [paddleApiKey, setPaddleApiKey] = useState("");
   const [openaiApiKey, setOpenaiApiKey] = useState("");
   const [webhookUrl, setWebhookUrl] = useState("");
   const [telegramBotToken, setTelegramBotToken] = useState("");
@@ -106,6 +107,7 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
     if (stripeSecretKey) body["stripe_secret_key"] = stripeSecretKey;
     if (revenuecatSecretKey) body["revenuecat_secret_key"] = revenuecatSecretKey;
     if (lemonsqueezyApiKey) body["lemonsqueezy_api_key"] = lemonsqueezyApiKey;
+    if (paddleApiKey) body["paddle_api_key"] = paddleApiKey;
     if (openaiApiKey) body["openai_api_key"] = openaiApiKey;
     if (webhookUrl) body["notify_webhook_url"] = webhookUrl;
     if (telegramBotToken) body["notify_telegram_token"] = telegramBotToken;
@@ -131,6 +133,7 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
     setStripeSecretKey("");
     setRevenuecatSecretKey("");
     setLemonsqueezyApiKey("");
+    setPaddleApiKey("");
     setOpenaiApiKey("");
     setWebhookUrl("");
     setTelegramBotToken("");
@@ -141,7 +144,7 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
     router.refresh();
   }
 
-  const hasChanges = !!(githubToken || vercelToken || stripeSecretKey || revenuecatSecretKey || lemonsqueezyApiKey || openaiApiKey || webhookUrl || telegramBotToken || telegramChatId || resendApiKey || digestEmail);
+  const hasChanges = !!(githubToken || vercelToken || stripeSecretKey || revenuecatSecretKey || lemonsqueezyApiKey || paddleApiKey || openaiApiKey || webhookUrl || telegramBotToken || telegramChatId || resendApiKey || digestEmail);
 
   async function handleSendDigest() {
     setSendingDigest(true);
@@ -253,6 +256,25 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
               onChange={(e) => setLemonsqueezyApiKey(e.target.value)}
               placeholder={savedKeys["lemonsqueezy_api_key"] ? "••••••••••••••••" : "eyJ0eXAiOiJKV1QiLCJhbGci..."} />
             <p className="text-xs text-muted-foreground">{t("lemonsqueezyApiKeyDesc")}</p>
+          </div>
+
+          {/* Paddle API Key */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="paddle-key" className="flex items-center gap-2">
+                {t("paddleApiKey")}
+                {savedKeys["paddle_api_key"] && <CheckCircle className="h-3.5 w-3.5 text-emerald-500" />}
+              </Label>
+              <a href="https://developer.paddle.com/api-reference/overview"
+                target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-xs text-primary hover:underline">
+                {t("createToken")} <ExternalLink className="h-3 w-3" />
+              </a>
+            </div>
+            <Input id="paddle-key" type="password" value={paddleApiKey}
+              onChange={(e) => setPaddleApiKey(e.target.value)}
+              placeholder={savedKeys["paddle_api_key"] ? "••••••••••••••••" : "pdl_live_xxxxxxxxxxxx"} />
+            <p className="text-xs text-muted-foreground">{t("paddleApiKeyDesc")}</p>
           </div>
 
           {/* OpenAI API Key */}

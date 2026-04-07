@@ -239,6 +239,8 @@
     "revenuecatSecretKeyDesc": "Used to fetch App Store / Play Store in-app purchase MRR and subscription data. Find it in RevenueCat dashboard → API Keys.",
     "lemonsqueezyApiKey": "Lemon Squeezy API Key",
     "lemonsqueezyApiKeyDesc": "Used to fetch MRR and subscription data. Supports SaaS and digital product sales with built-in tax handling. Find it in Lemon Squeezy → Settings → API.",
+    "paddleApiKey": "Paddle API Key",
+    "paddleApiKeyDesc": "Used to fetch MRR and subscription data. Supports subscription SaaS with built-in tax handling. Find it in Paddle dashboard → Developer Tools → Authentication.",
     "openaiApiKey": "OpenAI API Key",
     "openaiApiKeyDesc": "Powers the AI Copilot. Uses gpt-4o-mini — very low cost per analysis.",
     "statusPage": {
@@ -356,6 +358,45 @@
       "add": "Record",
       "adding": "Recording..."
     }
+  },
+  "timer": {
+    "title": "Start Timer",
+    "start": "Start",
+    "stop": "Stop",
+    "save": "Save Session",
+    "saving": "Saving...",
+    "discard": "Discard",
+    "saveSession": "Save this work session",
+    "duration": "Duration"
+  },
+  "csvImport": {
+    "title": "CSV Bulk Import",
+    "desc": "Import historical revenue or time data from a CSV file. The first row must contain column names.",
+    "format": "Column format (first row)",
+    "type": {
+      "revenue": "Revenue",
+      "time": "Time"
+    },
+    "example": {
+      "revenue": "e.g. 2024-01-01,99.00,USD,mrr,stripe,MyApp",
+      "time": "e.g. 2024-01-01,2,30,MyApp,Writing code"
+    },
+    "clickToUpload": "Click to select a CSV file",
+    "csvOnly": ".csv files only",
+    "rows": "rows",
+    "andMore": "… and {count} more rows",
+    "importing": "Importing...",
+    "importAll": "Import all {count} rows",
+    "success": "✓ Successfully imported {count} records",
+    "noImported": "No records were imported",
+    "moreErrors": "… and {count} more errors"
+  },
+  "paddle": {
+    "addDesc": "Uses the Paddle API Key from Settings to pull subscription data. MRR is automatically logged to revenue on each sync.",
+    "sandbox": "Use Sandbox environment",
+    "activeSubscriptions": "Active Subscriptions",
+    "totalTransactions": "Total Transactions",
+    "autoLogged": "MRR auto-logged to revenue"
   },
   "lemonsqueezy": {
     "addDesc": "Uses the Lemon Squeezy API Key from Settings to pull subscription data. MRR is automatically logged to revenue on each sync.",
