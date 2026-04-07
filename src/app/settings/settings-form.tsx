@@ -42,6 +42,9 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
   const [portfolioToken, setPortfolioToken] = useState<string | null>(null);
   const [portfolioCopied, setPortfolioCopied] = useState(false);
   const [portfolioLoading, setPortfolioLoading] = useState(false);
+  const [changelogToken, setChangelogToken] = useState<string | null>(null);
+  const [changelogCopied, setChangelogCopied] = useState(false);
+  const [changelogLoading, setChangelogLoading] = useState(false);
 
   const loadCronSecret = useCallback(async () => {
     setCronLoading(true);
@@ -65,6 +68,17 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
     }
   }, []);
 
+  const loadChangelogToken = useCallback(async () => {
+    setChangelogLoading(true);
+    try {
+      const res = await fetch("/api/changelog-token");
+      const data = await res.json() as { token: string };
+      setChangelogToken(data.token);
+    } finally {
+      setChangelogLoading(false);
+    }
+  }, []);
+
   const loadPortfolioToken = useCallback(async () => {
     setPortfolioLoading(true);
     try {
@@ -80,7 +94,8 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
     loadCronSecret();
     loadStatusToken();
     loadPortfolioToken();
-  }, [loadCronSecret, loadStatusToken, loadPortfolioToken]);
+    loadChangelogToken();
+  }, [loadCronSecret, loadStatusToken, loadPortfolioToken, loadChangelogToken]);
 
   const portfolioUrl = portfolioToken
     ? `${typeof window !== "undefined" ? window.location.origin : ""}/portfolio/${portfolioToken}`
@@ -91,6 +106,28 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
     await navigator.clipboard.writeText(portfolioUrl);
     setPortfolioCopied(true);
     setTimeout(() => setPortfolioCopied(false), 2000);
+  }
+
+  const changelogUrl = changelogToken
+    ? `${typeof window !== "undefined" ? window.location.origin : ""}/changelog/${changelogToken}`
+    : "";
+
+  async function handleCopyChangelogUrl() {
+    if (!changelogUrl) return;
+    await navigator.clipboard.writeText(changelogUrl);
+    setChangelogCopied(true);
+    setTimeout(() => setChangelogCopied(false), 2000);
+  }
+
+  async function handleRegenChangelogToken() {
+    setChangelogLoading(true);
+    try {
+      const res = await fetch("/api/changelog-token", { method: "POST" });
+      const data = await res.json() as { token: string };
+      setChangelogToken(data.token);
+    } finally {
+      setChangelogLoading(false);
+    }
   }
 
   async function handleRegenPortfolioToken() {
@@ -494,6 +531,40 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
               className="inline-flex items-center gap-1.5 text-xs text-primary hover:underline">
               <ExternalLink className="h-3 w-3" />
               {t("portfolio.preview")}
+            </a>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Changelog Page */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <Radio className="h-4 w-4" />
+            {t("changelog.title")}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-muted-foreground">{t("changelog.desc")}</p>
+          <div className="space-y-2">
+            <Label>{t("changelog.url")}</Label>
+            <div className="flex gap-2">
+              <Input readOnly value={changelogLoading ? t("cron.loading") : changelogUrl}
+                className="font-mono text-xs" />
+              <Button variant="outline" size="icon" onClick={handleCopyChangelogUrl} disabled={!changelogUrl}>
+                {changelogCopied ? <CheckCircle className="h-4 w-4 text-emerald-500" /> : <Copy className="h-4 w-4" />}
+              </Button>
+              <Button variant="outline" size="icon" onClick={handleRegenChangelogToken} disabled={changelogLoading}
+                title={t("changelog.regenerate")}>
+                <RefreshCw className={`h-4 w-4 ${changelogLoading ? "animate-spin" : ""}`} />
+              </Button>
+            </div>
+          </div>
+          {changelogUrl && (
+            <a href={`/changelog/${changelogToken}`} target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs text-primary hover:underline">
+              <ExternalLink className="h-3 w-3" />
+              {t("changelog.preview")}
             </a>
           )}
         </CardContent>

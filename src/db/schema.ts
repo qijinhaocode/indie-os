@@ -74,7 +74,7 @@ export const integrations = sqliteTable("integrations", {
   projectId: integer("project_id")
     .notNull()
     .references(() => projects.id, { onDelete: "cascade" }),
-  type: text("type", { enum: ["github", "vercel", "stripe", "http", "revenuecat", "lemonsqueezy", "paddle", "plausible"] }).notNull(),
+  type: text("type", { enum: ["github", "vercel", "stripe", "http", "revenuecat", "lemonsqueezy", "paddle", "plausible", "appstore"] }).notNull(),
   config: text("config").notNull().default("{}"),
   cachedData: text("cached_data"),
   lastSyncedAt: text("last_synced_at"),

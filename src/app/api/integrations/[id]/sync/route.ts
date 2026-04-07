@@ -5,6 +5,72 @@ import { eq, sql } from "drizzle-orm";
 import Stripe from "stripe";
 import { sendDownAlert } from "@/lib/notify";
 
+interface AppStoreData {
+  appId: string;
+  name: string;
+  icon: string;
+  rating: number;
+  ratingCount: number;
+  price: number;
+  currency: string;
+  genre: string;
+  version: string;
+  releaseNotes?: string;
+  sellerName: string;
+  storeUrl: string;
+  syncedAt: string;
+}
+
+async function syncAppStore(integration: { id: number; config: string }): Promise<AppStoreData> {
+  const config = JSON.parse(integration.config) as {
+    appId: string;
+    country?: string;
+  };
+  const country = config.country ?? "us";
+  const url = `https://itunes.apple.com/lookup?id=${encodeURIComponent(config.appId)}&country=${country}`;
+
+  const res = await fetch(url, { next: { revalidate: 0 } });
+  if (!res.ok) throw new Error(`iTunes API error ${res.status}`);
+
+  const json = await res.json() as {
+    resultCount: number;
+    results: {
+      trackName: string;
+      artworkUrl100: string;
+      averageUserRating: number;
+      userRatingCount: number;
+      price: number;
+      currency: string;
+      primaryGenreName: string;
+      version: string;
+      releaseNotes?: string;
+      sellerName: string;
+      trackViewUrl: string;
+    }[];
+  };
+
+  if (!json.resultCount || !json.results[0]) {
+    throw new Error(`App ID ${config.appId} not found in App Store (${country})`);
+  }
+
+  const r = json.results[0];
+  return {
+    appId: config.appId,
+    name: r.trackName,
+    icon: r.artworkUrl100,
+    rating: r.averageUserRating ?? 0,
+    ratingCount: r.userRatingCount ?? 0,
+    price: r.price ?? 0,
+    currency: r.currency ?? "USD",
+    genre: r.primaryGenreName ?? "",
+    version: r.version ?? "",
+    releaseNotes: r.releaseNotes,
+    sellerName: r.sellerName ?? "",
+    storeUrl: r.trackViewUrl ?? "",
+    syncedAt: new Date().toISOString(),
+  };
+}
+
 interface PlausibleData {
   visitors30d: number;
   pageviews30d: number;
@@ -591,6 +657,8 @@ export async function POST(
           });
         }
       }
+    } else if (integration.type === "appstore") {
+      cachedData = await syncAppStore(integration);
     } else if (integration.type === "plausible") {
       const tokenRow = await db.query.appSettings.findFirst({
         where: eq(appSettings.key, "plausible_api_key"),

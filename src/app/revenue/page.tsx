@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { DollarSign, Plus, Download } from "lucide-react";
 import { LogRevenueDialog } from "./log-revenue-dialog";
 import { DeleteEntryButton } from "./delete-entry-button";
+import { RevenueForecastChart } from "@/components/dashboard/revenue-forecast-chart";
 import Link from "next/link";
 
 const typeVariant = {
@@ -78,6 +79,8 @@ export default async function RevenuePage() {
           <div className="text-3xl font-bold">{formatCurrency(totalMRR)}</div>
         </CardContent>
       </Card>
+
+      <RevenueForecastChart />
 
       {entries.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border py-16 text-center">

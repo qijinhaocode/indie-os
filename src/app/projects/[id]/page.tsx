@@ -19,6 +19,7 @@ import { LemonSqueezyIntegration } from "@/components/dashboard/lemonsqueezy-int
 import { PaddleIntegration } from "@/components/dashboard/paddle-integration";
 import { PlausibleIntegration } from "@/components/dashboard/plausible-integration";
 import { ProjectNotes } from "@/components/dashboard/project-notes";
+import { AppStoreIntegration } from "@/components/dashboard/appstore-integration";
 import { KpiTracker } from "@/components/dashboard/kpi-tracker";
 import { MilestoneLog } from "@/components/dashboard/milestone-log";
 import { ShareButton } from "./share-button";
@@ -328,6 +329,7 @@ export default async function ProjectDetailPage({
         <LemonSqueezyIntegration projectId={project.id} integrations={projectIntegrations} />
         <PaddleIntegration projectId={project.id} integrations={projectIntegrations} />
         <PlausibleIntegration projectId={project.id} integrations={projectIntegrations} />
+        <AppStoreIntegration projectId={project.id} integrations={projectIntegrations} />
         <ProjectNotes projectId={project.id} initialContent={noteContent} />
         <KpiTracker projectId={project.id} metrics={metricsWithValues} />
         <MilestoneLog projectId={project.id} milestones={projectMilestones} />
