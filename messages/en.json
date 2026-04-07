@@ -26,7 +26,8 @@
     "charts": {
       "revenueTitle": "Revenue (last 6 months)",
       "timeTitle": "Time by project this month (hours)",
-      "revenueSourceTitle": "Revenue by source"
+      "revenueSourceTitle": "Revenue by source",
+      "roiTitle": "Project ROI ranking ($/hour)"
     },
     "noProjects": "No projects yet.",
     "addFirstProject": "Add your first project →",
@@ -314,6 +315,47 @@
     "activeSubscriptions": "Active Subscriptions",
     "customers": "Total Customers",
     "autoLogged": "MRR auto-logged to revenue"
+  },
+  "kpi": {
+    "title": "Custom KPIs",
+    "addMetric": "Add Metric",
+    "empty": "No custom metrics yet. Add DAU, signups, or any data you care about.",
+    "deleteConfirm": "Delete this metric and all its historical data?",
+    "logValue": "+ Log value",
+    "form": {
+      "name": "Metric name",
+      "namePlaceholder": "Daily Active Users, Signups...",
+      "unit": "Unit",
+      "unitPlaceholder": "users, %, sessions...",
+      "description": "Note",
+      "descriptionPlaceholder": "Optional description",
+      "examples": "Examples: DAU (users), Conversion rate (%), Newsletter subscribers (people), App Store rating (stars)",
+      "add": "Add",
+      "adding": "Adding..."
+    },
+    "logForm": {
+      "value": "Value",
+      "date": "Date",
+      "notePlaceholder": "Note (optional)",
+      "log": "Log",
+      "logging": "Logging..."
+    }
+  },
+  "milestones": {
+    "title": "Milestones",
+    "add": "Add Milestone",
+    "empty": "No milestones yet. Record your first important moment.",
+    "deleteConfirm": "Delete this milestone?",
+    "form": {
+      "icon": "Icon",
+      "title": "Title",
+      "titlePlaceholder": "First paying customer, $1000 MRR, Product launch...",
+      "description": "Note",
+      "descriptionPlaceholder": "Optional note",
+      "date": "Date",
+      "add": "Record",
+      "adding": "Recording..."
+    }
   },
   "lemonsqueezy": {
     "addDesc": "Uses the Lemon Squeezy API Key from Settings to pull subscription data. MRR is automatically logged to revenue on each sync.",

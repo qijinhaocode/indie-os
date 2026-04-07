@@ -95,6 +95,40 @@ export const goals = sqliteTable("goals", {
   createdAt: text("created_at").default(sql`(datetime('now'))`),
 });
 
+export const kpiMetrics = sqliteTable("kpi_metrics", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  projectId: integer("project_id")
+    .notNull()
+    .references(() => projects.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  unit: text("unit").notNull().default(""),
+  description: text("description"),
+  createdAt: text("created_at").default(sql`(datetime('now'))`),
+});
+
+export const kpiValues = sqliteTable("kpi_values", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  metricId: integer("metric_id")
+    .notNull()
+    .references(() => kpiMetrics.id, { onDelete: "cascade" }),
+  value: real("value").notNull(),
+  note: text("note"),
+  recordedAt: text("recorded_at").notNull(),
+  createdAt: text("created_at").default(sql`(datetime('now'))`),
+});
+
+export const milestones = sqliteTable("milestones", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  projectId: integer("project_id")
+    .notNull()
+    .references(() => projects.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  description: text("description"),
+  icon: text("icon").default("🎯"),
+  occurredAt: text("occurred_at").notNull(),
+  createdAt: text("created_at").default(sql`(datetime('now'))`),
+});
+
 export const uptimeHistory = sqliteTable("uptime_history", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   integrationId: integer("integration_id")
@@ -115,3 +149,6 @@ export type Integration = typeof integrations.$inferSelect;
 export type AppSetting = typeof appSettings.$inferSelect;
 export type Goal = typeof goals.$inferSelect;
 export type UptimeHistory = typeof uptimeHistory.$inferSelect;
+export type KpiMetric = typeof kpiMetrics.$inferSelect;
+export type KpiValue = typeof kpiValues.$inferSelect;
+export type Milestone = typeof milestones.$inferSelect;

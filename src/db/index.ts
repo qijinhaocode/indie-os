@@ -32,6 +32,31 @@ const migrations = [
     response_time_ms INTEGER,
     checked_at TEXT NOT NULL
   )`,
+  `CREATE TABLE IF NOT EXISTS kpi_metrics (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    unit TEXT NOT NULL DEFAULT '',
+    description TEXT,
+    created_at TEXT DEFAULT (datetime('now'))
+  )`,
+  `CREATE TABLE IF NOT EXISTS kpi_values (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    metric_id INTEGER NOT NULL REFERENCES kpi_metrics(id) ON DELETE CASCADE,
+    value REAL NOT NULL,
+    note TEXT,
+    recorded_at TEXT NOT NULL,
+    created_at TEXT DEFAULT (datetime('now'))
+  )`,
+  `CREATE TABLE IF NOT EXISTS milestones (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
+    description TEXT,
+    icon TEXT DEFAULT '🎯',
+    occurred_at TEXT NOT NULL,
+    created_at TEXT DEFAULT (datetime('now'))
+  )`,
 ];
 
 for (const stmt of migrations) {

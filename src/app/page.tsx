@@ -20,6 +20,7 @@ import { AiCopilot } from "@/components/dashboard/ai-copilot";
 import { RevenueChart } from "@/components/dashboard/revenue-chart";
 import { TimeChart } from "@/components/dashboard/time-chart";
 import { RevenueSourceChart } from "@/components/dashboard/revenue-source-chart";
+import { RoiChart } from "@/components/dashboard/roi-chart";
 import { Progress } from "@/components/ui/progress";
 import { Target } from "lucide-react";
 
@@ -113,6 +114,40 @@ async function getStats() {
       hours: +(t.minutes / 60).toFixed(1),
     }));
 
+  // ROI by project: total MRR / total hours (all time)
+  const revenueByProject = await db
+    .select({
+      projectId: revenueEntries.projectId,
+      total: sql<number>`coalesce(sum(${revenueEntries.amount}), 0)`,
+    })
+    .from(revenueEntries)
+    .where(eq(revenueEntries.type, "mrr"))
+    .groupBy(revenueEntries.projectId);
+
+  const timeByProjectAll = await db
+    .select({
+      projectId: timeLogs.projectId,
+      minutes: sql<number>`coalesce(sum(${timeLogs.minutes}), 0)`,
+      projectName: projects.name,
+    })
+    .from(timeLogs)
+    .leftJoin(projects, eq(timeLogs.projectId, projects.id))
+    .groupBy(timeLogs.projectId);
+
+  const roiChartData = timeByProjectAll
+    .filter((t) => t.minutes > 60) // min 1 hour logged
+    .map((t) => {
+      const rev = revenueByProject.find((r) => r.projectId === t.projectId);
+      const roi = rev ? rev.total / (t.minutes / 60) : 0;
+      return {
+        project: (t.projectName ?? "Unknown").slice(0, 12),
+        roi: parseFloat(roi.toFixed(2)),
+      };
+    })
+    .filter((d) => d.roi > 0)
+    .sort((a, b) => b.roi - a.roi)
+    .slice(0, 6);
+
   const revenueSourceData = revenueBySource
     .filter((r) => r.amount > 0)
     .map((r) => ({ source: r.source, amount: r.amount }));
@@ -161,6 +196,7 @@ async function getStats() {
     revenueChartData,
     timeChartData,
     revenueSourceData,
+    roiChartData,
     goalsWithProgress,
   };
 }
@@ -175,7 +211,7 @@ const statusVariant = {
 export default async function DashboardPage() {
   const t = await getTranslations("overview");
   const tp = await getTranslations("projects");
-  const { projects: allProjects, totalProjects, activeCount, totalMRR, monthlyMinutes, probesSummary, hasOpenAiKey, revenueChartData, timeChartData, revenueSourceData, goalsWithProgress } = await getStats();
+  const { projects: allProjects, totalProjects, activeCount, totalMRR, monthlyMinutes, probesSummary, hasOpenAiKey, revenueChartData, timeChartData, revenueSourceData, roiChartData, goalsWithProgress } = await getStats();
   const recentProjects = allProjects.slice(0, 5);
   const upCount = probesSummary.filter((p) => p.status === "up").length;
   const downCount = probesSummary.filter((p) => p.status === "down" || p.status === "degraded").length;
@@ -248,7 +284,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Charts */}
-      {(revenueChartData.length > 0 || timeChartData.length > 0 || revenueSourceData.length > 1) && (
+      {(revenueChartData.length > 0 || timeChartData.length > 0 || revenueSourceData.length > 1 || roiChartData.length >= 2) && (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {revenueChartData.length > 0 && (
             <Card>
@@ -268,6 +304,13 @@ export default async function DashboardPage() {
             <Card>
               <CardContent className="pt-5">
                 <RevenueSourceChart data={revenueSourceData} />
+              </CardContent>
+            </Card>
+          )}
+          {roiChartData.length >= 2 && (
+            <Card>
+              <CardContent className="pt-5">
+                <RoiChart data={roiChartData} />
               </CardContent>
             </Card>
           )}

@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { projects, revenueEntries, timeLogs, integrations, uptimeHistory } from "@/db/schema";
+import { projects, revenueEntries, timeLogs, integrations, uptimeHistory, kpiMetrics, kpiValues, milestones } from "@/db/schema";
 import { eq, sql, desc, inArray } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -16,6 +16,8 @@ import { HttpProbeIntegration } from "@/components/dashboard/http-probe-integrat
 import { StripeIntegration } from "@/components/dashboard/stripe-integration";
 import { RevenueCatIntegration } from "@/components/dashboard/revenuecat-integration";
 import { LemonSqueezyIntegration } from "@/components/dashboard/lemonsqueezy-integration";
+import { KpiTracker } from "@/components/dashboard/kpi-tracker";
+import { MilestoneLog } from "@/components/dashboard/milestone-log";
 import { ShareButton } from "./share-button";
 
 const statusVariant = {
@@ -94,6 +96,32 @@ export default async function ProjectDetailPage({
       }
     }
   }
+
+  // KPI metrics with latest values
+  const projectKpiMetrics = await db
+    .select()
+    .from(kpiMetrics)
+    .where(eq(kpiMetrics.projectId, project.id))
+    .orderBy(kpiMetrics.createdAt);
+
+  const metricsWithValues = await Promise.all(
+    projectKpiMetrics.map(async (m) => {
+      const values = await db
+        .select()
+        .from(kpiValues)
+        .where(eq(kpiValues.metricId, m.id))
+        .orderBy(desc(kpiValues.recordedAt))
+        .limit(90);
+      return { ...m, values };
+    })
+  );
+
+  // Milestones
+  const projectMilestones = await db
+    .select()
+    .from(milestones)
+    .where(eq(milestones.projectId, project.id))
+    .orderBy(desc(milestones.occurredAt));
 
   const recentRevenue = await db
     .select()
@@ -290,6 +318,8 @@ export default async function ProjectDetailPage({
         <StripeIntegration projectId={project.id} integrations={projectIntegrations} />
         <RevenueCatIntegration projectId={project.id} integrations={projectIntegrations} />
         <LemonSqueezyIntegration projectId={project.id} integrations={projectIntegrations} />
+        <KpiTracker projectId={project.id} metrics={metricsWithValues} />
+        <MilestoneLog projectId={project.id} milestones={projectMilestones} />
       </div>
     </div>
   );

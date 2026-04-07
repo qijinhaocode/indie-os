@@ -26,7 +26,8 @@
     "charts": {
       "revenueTitle": "近 6 个月收入",
       "timeTitle": "本月各项目投入（小时）",
-      "revenueSourceTitle": "收入来源分布"
+      "revenueSourceTitle": "收入来源分布",
+      "roiTitle": "项目 ROI 排行（$/小时）"
     },
     "noProjects": "暂无项目",
     "addFirstProject": "添加你的第一个项目 →",
@@ -314,6 +315,47 @@
     "activeSubscriptions": "活跃订阅",
     "customers": "客户总数",
     "autoLogged": "MRR 已自动写入收入记录"
+  },
+  "kpi": {
+    "title": "自定义 KPI",
+    "addMetric": "添加指标",
+    "empty": "还没有自定义指标，添加 DAU、注册量等你关注的数据",
+    "deleteConfirm": "确认删除这个指标及其所有历史数据？",
+    "logValue": "+ 记录数据",
+    "form": {
+      "name": "指标名称",
+      "namePlaceholder": "日活用户（DAU）、注册量...",
+      "unit": "单位",
+      "unitPlaceholder": "人、%、次...",
+      "description": "备注",
+      "descriptionPlaceholder": "可选说明",
+      "examples": "示例：DAU（人）、转化率（%）、Newsletter 订阅量（人）、App Store 评分（分）",
+      "add": "添加",
+      "adding": "添加中..."
+    },
+    "logForm": {
+      "value": "数值",
+      "date": "日期",
+      "notePlaceholder": "备注（可选）",
+      "log": "记录",
+      "logging": "记录中..."
+    }
+  },
+  "milestones": {
+    "title": "项目里程碑",
+    "add": "记录里程碑",
+    "empty": "还没有里程碑，记录第一个重要时刻吧",
+    "deleteConfirm": "确认删除这条里程碑记录？",
+    "form": {
+      "icon": "图标",
+      "title": "标题",
+      "titlePlaceholder": "第一个付费用户、达到 $1000 MRR、产品上线...",
+      "description": "备注",
+      "descriptionPlaceholder": "可选说明",
+      "date": "日期",
+      "add": "记录",
+      "adding": "记录中..."
+    }
   },
   "lemonsqueezy": {
     "addDesc": "使用 Settings 中填写的 Lemon Squeezy API Key 拉取订阅数据。同步后 MRR 自动写入收入记录。",
