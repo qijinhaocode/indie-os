@@ -22,6 +22,10 @@
     },
     "recentProjects": "最近项目",
     "serviceHealth": "服务健康",
+    "charts": {
+      "revenueTitle": "近 6 个月收入",
+      "timeTitle": "本月各项目投入（小时）"
+    },
     "noProjects": "暂无项目",
     "addFirstProject": "添加你的第一个项目 →",
     "noServices": "还没有 HTTP 探针",
@@ -173,6 +177,13 @@
     "vercelTokenDesc": "用于拉取部署状态和项目信息。",
     "vercelTokenPlaceholder": "xxxxxxxxxxxxxxxxxxxxxxxx",
     "exportBackup": "导出全量备份",
+    "notify": {
+      "title": "下线通知",
+      "desc": "当 HTTP 探针检测到服务不可达时，自动推送通知。支持 Slack、Discord、Telegram 等。",
+      "webhookUrl": "Webhook URL",
+      "webhookDesc": "兼容 Slack Incoming Webhook、Discord Webhook、以及任意接受 JSON POST 的端点。",
+      "telegramDesc": "在 @BotFather 创建机器人获取 Token，将机器人加入群组或私聊获取 Chat ID。"
+    },
     "stripeSecretKey": "Stripe Secret Key",
     "stripeSecretKeyDesc": "用于拉取 MRR、订阅和收入数据。使用受限密钥（Restricted Key）仅授予 read 权限更安全。",
     "stripeSecretKeyPlaceholder": "sk_live_xxxxxxxxxxxx",

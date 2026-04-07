@@ -17,6 +17,8 @@ import {
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { AiCopilot } from "@/components/dashboard/ai-copilot";
+import { RevenueChart } from "@/components/dashboard/revenue-chart";
+import { TimeChart } from "@/components/dashboard/time-chart";
 
 interface HttpCachedData {
   status: "up" | "down" | "degraded";
@@ -54,6 +56,50 @@ async function getStats() {
     where: eq(appSettings.key, "openai_api_key"),
   }))?.value;
 
+  // Revenue chart: last 6 months grouped by month
+  const sixMonthsAgo = new Date();
+  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5);
+  const sixMonthsAgoStr = `${sixMonthsAgo.getFullYear()}-${String(sixMonthsAgo.getMonth() + 1).padStart(2, "0")}-01`;
+
+  const revenueByMonth = await db
+    .select({
+      month: sql<string>`strftime('%Y-%m', ${revenueEntries.recordedAt})`,
+      revenue: sql<number>`coalesce(sum(${revenueEntries.amount}), 0)`,
+    })
+    .from(revenueEntries)
+    .where(sql`${revenueEntries.recordedAt} >= ${sixMonthsAgoStr}`)
+    .groupBy(sql`strftime('%Y-%m', ${revenueEntries.recordedAt})`)
+    .orderBy(sql`strftime('%Y-%m', ${revenueEntries.recordedAt})`);
+
+  // Time chart: last 30 days by project
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+    .toISOString()
+    .split("T")[0];
+
+  const timeByProject = await db
+    .select({
+      project: projects.name,
+      minutes: sql<number>`coalesce(sum(${timeLogs.minutes}), 0)`,
+    })
+    .from(timeLogs)
+    .leftJoin(projects, eq(timeLogs.projectId, projects.id))
+    .where(sql`${timeLogs.loggedAt} >= ${thirtyDaysAgo}`)
+    .groupBy(timeLogs.projectId)
+    .orderBy(sql`sum(${timeLogs.minutes}) desc`)
+    .limit(6);
+
+  const revenueChartData = revenueByMonth.map((r) => ({
+    month: r.month,
+    revenue: r.revenue,
+  }));
+
+  const timeChartData = timeByProject
+    .filter((t) => t.project && t.minutes > 0)
+    .map((t) => ({
+      project: (t.project ?? "Unknown").slice(0, 14),
+      hours: +(t.minutes / 60).toFixed(1),
+    }));
+
   return {
     projects: allProjects,
     totalProjects: allProjects.length,
@@ -62,6 +108,8 @@ async function getStats() {
     monthlyMinutes,
     probesSummary,
     hasOpenAiKey,
+    revenueChartData,
+    timeChartData,
   };
 }
 
@@ -75,7 +123,7 @@ const statusVariant = {
 export default async function DashboardPage() {
   const t = await getTranslations("overview");
   const tp = await getTranslations("projects");
-  const { projects: allProjects, totalProjects, activeCount, totalMRR, monthlyMinutes, probesSummary, hasOpenAiKey } = await getStats();
+  const { projects: allProjects, totalProjects, activeCount, totalMRR, monthlyMinutes, probesSummary, hasOpenAiKey, revenueChartData, timeChartData } = await getStats();
   const recentProjects = allProjects.slice(0, 5);
   const upCount = probesSummary.filter((p) => p.status === "up").length;
   const downCount = probesSummary.filter((p) => p.status === "down" || p.status === "degraded").length;
@@ -146,6 +194,26 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Charts */}
+      {(revenueChartData.length > 0 || timeChartData.length > 0) && (
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          {revenueChartData.length > 0 && (
+            <Card>
+              <CardContent className="pt-5">
+                <RevenueChart data={revenueChartData} />
+              </CardContent>
+            </Card>
+          )}
+          {timeChartData.length > 0 && (
+            <Card>
+              <CardContent className="pt-5">
+                <TimeChart data={timeChartData} />
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card>

@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle, ExternalLink, Copy, RefreshCw } from "lucide-react";
+import { CheckCircle, ExternalLink, Copy, RefreshCw, Bell } from "lucide-react";
 
 interface SettingsFormProps {
   savedKeys: Record<string, boolean>;
@@ -20,6 +20,9 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
   const [vercelToken, setVercelToken] = useState("");
   const [stripeSecretKey, setStripeSecretKey] = useState("");
   const [openaiApiKey, setOpenaiApiKey] = useState("");
+  const [webhookUrl, setWebhookUrl] = useState("");
+  const [telegramBotToken, setTelegramBotToken] = useState("");
+  const [telegramChatId, setTelegramChatId] = useState("");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [cronSecret, setCronSecret] = useState<string | null>(null);
@@ -59,6 +62,9 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
     if (vercelToken) body["vercel_token"] = vercelToken;
     if (stripeSecretKey) body["stripe_secret_key"] = stripeSecretKey;
     if (openaiApiKey) body["openai_api_key"] = openaiApiKey;
+    if (webhookUrl) body["notify_webhook_url"] = webhookUrl;
+    if (telegramBotToken) body["notify_telegram_token"] = telegramBotToken;
+    if (telegramChatId) body["notify_telegram_chat_id"] = telegramChatId;
 
     if (Object.keys(body).length === 0) {
       setSaving(false);
@@ -77,11 +83,14 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
     setVercelToken("");
     setStripeSecretKey("");
     setOpenaiApiKey("");
+    setWebhookUrl("");
+    setTelegramBotToken("");
+    setTelegramChatId("");
     setTimeout(() => setSaved(false), 3000);
     router.refresh();
   }
 
-  const hasChanges = !!(githubToken || vercelToken || stripeSecretKey || openaiApiKey);
+  const hasChanges = !!(githubToken || vercelToken || stripeSecretKey || openaiApiKey || webhookUrl || telegramBotToken || telegramChatId);
 
   return (
     <div className="space-y-4">
@@ -160,6 +169,61 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
               onChange={(e) => setOpenaiApiKey(e.target.value)}
               placeholder={savedKeys["openai_api_key"] ? "••••••••••••••••" : "sk-..."} />
             <p className="text-xs text-muted-foreground">{t("openaiApiKeyDesc")}</p>
+          </div>
+
+          <Button onClick={handleSave} disabled={saving || !hasChanges}>
+            {saved ? t("saved") : saving ? t("saving") : t("save")}
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Notifications */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <Bell className="h-4 w-4" />
+            {t("notify.title")}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <p className="text-sm text-muted-foreground">{t("notify.desc")}</p>
+
+          {/* Generic Webhook */}
+          <div className="space-y-2">
+            <Label htmlFor="webhook-url" className="flex items-center gap-2">
+              {t("notify.webhookUrl")}
+              {savedKeys["notify_webhook_url"] && <CheckCircle className="h-3.5 w-3.5 text-emerald-500" />}
+            </Label>
+            <Input id="webhook-url" type="url" value={webhookUrl}
+              onChange={(e) => setWebhookUrl(e.target.value)}
+              placeholder={savedKeys["notify_webhook_url"] ? "••••••••" : "https://hooks.slack.com/... or Discord webhook"} />
+            <p className="text-xs text-muted-foreground">{t("notify.webhookDesc")}</p>
+          </div>
+
+          {/* Telegram */}
+          <div className="space-y-3">
+            <p className="text-sm font-medium">Telegram</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="tg-token" className="flex items-center gap-2">
+                  Bot Token
+                  {savedKeys["notify_telegram_token"] && <CheckCircle className="h-3.5 w-3.5 text-emerald-500" />}
+                </Label>
+                <Input id="tg-token" type="password" value={telegramBotToken}
+                  onChange={(e) => setTelegramBotToken(e.target.value)}
+                  placeholder={savedKeys["notify_telegram_token"] ? "••••••••" : "123456:ABC-..."} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="tg-chat" className="flex items-center gap-2">
+                  Chat ID
+                  {savedKeys["notify_telegram_chat_id"] && <CheckCircle className="h-3.5 w-3.5 text-emerald-500" />}
+                </Label>
+                <Input id="tg-chat" type="text" value={telegramChatId}
+                  onChange={(e) => setTelegramChatId(e.target.value)}
+                  placeholder={savedKeys["notify_telegram_chat_id"] ? "••••••••" : "-100123456789"} />
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground">{t("notify.telegramDesc")}</p>
           </div>
 
           <Button onClick={handleSave} disabled={saving || !hasChanges}>

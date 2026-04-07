@@ -22,6 +22,10 @@
     },
     "recentProjects": "Recent Projects",
     "serviceHealth": "Service Health",
+    "charts": {
+      "revenueTitle": "Revenue (last 6 months)",
+      "timeTitle": "Time by project this month (hours)"
+    },
     "noProjects": "No projects yet.",
     "addFirstProject": "Add your first project →",
     "noServices": "No HTTP probes yet",
@@ -173,6 +177,13 @@
     "vercelTokenDesc": "Used to fetch deployment status and project info.",
     "vercelTokenPlaceholder": "xxxxxxxxxxxxxxxxxxxxxxxx",
     "exportBackup": "Export Full Backup",
+    "notify": {
+      "title": "Down Alerts",
+      "desc": "Get notified when an HTTP probe detects a service is down. Supports Slack, Discord, Telegram, and generic webhooks.",
+      "webhookUrl": "Webhook URL",
+      "webhookDesc": "Compatible with Slack Incoming Webhooks, Discord Webhooks, and any endpoint that accepts a JSON POST.",
+      "telegramDesc": "Create a bot via @BotFather to get a token. Add the bot to your group or DM it to get the Chat ID."
+    },
     "stripeSecretKey": "Stripe Secret Key",
     "stripeSecretKeyDesc": "Used to fetch MRR, subscriptions, and revenue. Use a Restricted Key with read-only permissions for security.",
     "stripeSecretKeyPlaceholder": "sk_live_xxxxxxxxxxxx",

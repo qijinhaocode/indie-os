@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
-import { integrations, appSettings, revenueEntries } from "@/db/schema";
+import { integrations, appSettings, revenueEntries, projects } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import Stripe from "stripe";
+import { sendDownAlert } from "@/lib/notify";
 
 interface StripeData {
   mrr: number; // in cents
@@ -225,7 +226,30 @@ export async function POST(
       }
       cachedData = await syncGitHub(integration, tokenRow.value);
     } else if (integration.type === "http") {
+      // Capture previous status to detect transitions
+      const prevStatus = integration.cachedData
+        ? (JSON.parse(integration.cachedData) as { status: string }).status
+        : null;
+
       cachedData = await syncHttp(integration);
+      const httpResult = cachedData as { status: string; statusCode: number | null; error: string | null };
+
+      // Notify only when transitioning into "down" or "degraded"
+      if (
+        httpResult.status !== "up" &&
+        prevStatus !== httpResult.status
+      ) {
+        const config = JSON.parse(integration.config) as { url: string; label?: string };
+        const project = await db.query.projects.findFirst({ where: eq(projects.id, integration.projectId) });
+        sendDownAlert({
+          projectName: project?.name ?? `Project #${integration.projectId}`,
+          integrationLabel: config.label ?? config.url,
+          url: config.url,
+          status: httpResult.status,
+          statusCode: httpResult.statusCode,
+          error: httpResult.error,
+        }).catch((e) => console.error("[notify]", e));
+      }
     } else if (integration.type === "vercel") {
       const tokenRow = await db.query.appSettings.findFirst({
         where: eq(appSettings.key, "vercel_token"),
