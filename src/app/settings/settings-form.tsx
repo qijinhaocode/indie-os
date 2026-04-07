@@ -22,6 +22,7 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
   const [revenuecatSecretKey, setRevenuecatSecretKey] = useState("");
   const [lemonsqueezyApiKey, setLemonsqueezyApiKey] = useState("");
   const [paddleApiKey, setPaddleApiKey] = useState("");
+  const [plausibleApiKey, setPlausibleApiKey] = useState("");
   const [openaiApiKey, setOpenaiApiKey] = useState("");
   const [webhookUrl, setWebhookUrl] = useState("");
   const [telegramBotToken, setTelegramBotToken] = useState("");
@@ -38,6 +39,9 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
   const [statusToken, setStatusToken] = useState<string | null>(null);
   const [statusCopied, setStatusCopied] = useState(false);
   const [statusLoading, setStatusLoading] = useState(false);
+  const [portfolioToken, setPortfolioToken] = useState<string | null>(null);
+  const [portfolioCopied, setPortfolioCopied] = useState(false);
+  const [portfolioLoading, setPortfolioLoading] = useState(false);
 
   const loadCronSecret = useCallback(async () => {
     setCronLoading(true);
@@ -61,10 +65,44 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
     }
   }, []);
 
+  const loadPortfolioToken = useCallback(async () => {
+    setPortfolioLoading(true);
+    try {
+      const res = await fetch("/api/portfolio-token");
+      const data = await res.json() as { token: string };
+      setPortfolioToken(data.token);
+    } finally {
+      setPortfolioLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     loadCronSecret();
     loadStatusToken();
-  }, [loadCronSecret, loadStatusToken]);
+    loadPortfolioToken();
+  }, [loadCronSecret, loadStatusToken, loadPortfolioToken]);
+
+  const portfolioUrl = portfolioToken
+    ? `${typeof window !== "undefined" ? window.location.origin : ""}/portfolio/${portfolioToken}`
+    : "";
+
+  async function handleCopyPortfolioUrl() {
+    if (!portfolioUrl) return;
+    await navigator.clipboard.writeText(portfolioUrl);
+    setPortfolioCopied(true);
+    setTimeout(() => setPortfolioCopied(false), 2000);
+  }
+
+  async function handleRegenPortfolioToken() {
+    setPortfolioLoading(true);
+    try {
+      const res = await fetch("/api/portfolio-token", { method: "POST" });
+      const data = await res.json() as { token: string };
+      setPortfolioToken(data.token);
+    } finally {
+      setPortfolioLoading(false);
+    }
+  }
 
   const statusUrl = statusToken
     ? `${typeof window !== "undefined" ? window.location.origin : ""}/status/${statusToken}`
@@ -108,6 +146,7 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
     if (revenuecatSecretKey) body["revenuecat_secret_key"] = revenuecatSecretKey;
     if (lemonsqueezyApiKey) body["lemonsqueezy_api_key"] = lemonsqueezyApiKey;
     if (paddleApiKey) body["paddle_api_key"] = paddleApiKey;
+    if (plausibleApiKey) body["plausible_api_key"] = plausibleApiKey;
     if (openaiApiKey) body["openai_api_key"] = openaiApiKey;
     if (webhookUrl) body["notify_webhook_url"] = webhookUrl;
     if (telegramBotToken) body["notify_telegram_token"] = telegramBotToken;
@@ -134,6 +173,7 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
     setRevenuecatSecretKey("");
     setLemonsqueezyApiKey("");
     setPaddleApiKey("");
+    setPlausibleApiKey("");
     setOpenaiApiKey("");
     setWebhookUrl("");
     setTelegramBotToken("");
@@ -144,7 +184,7 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
     router.refresh();
   }
 
-  const hasChanges = !!(githubToken || vercelToken || stripeSecretKey || revenuecatSecretKey || lemonsqueezyApiKey || paddleApiKey || openaiApiKey || webhookUrl || telegramBotToken || telegramChatId || resendApiKey || digestEmail);
+  const hasChanges = !!(githubToken || vercelToken || stripeSecretKey || revenuecatSecretKey || lemonsqueezyApiKey || paddleApiKey || plausibleApiKey || openaiApiKey || webhookUrl || telegramBotToken || telegramChatId || resendApiKey || digestEmail);
 
   async function handleSendDigest() {
     setSendingDigest(true);
@@ -277,6 +317,25 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
             <p className="text-xs text-muted-foreground">{t("paddleApiKeyDesc")}</p>
           </div>
 
+          {/* Plausible API Key */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="plausible-key" className="flex items-center gap-2">
+                {t("plausibleApiKey")}
+                {savedKeys["plausible_api_key"] && <CheckCircle className="h-3.5 w-3.5 text-emerald-500" />}
+              </Label>
+              <a href="https://plausible.io/settings/api-keys"
+                target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-xs text-primary hover:underline">
+                {t("createToken")} <ExternalLink className="h-3 w-3" />
+              </a>
+            </div>
+            <Input id="plausible-key" type="password" value={plausibleApiKey}
+              onChange={(e) => setPlausibleApiKey(e.target.value)}
+              placeholder={savedKeys["plausible_api_key"] ? "••••••••••••••••" : "plausible_..."} />
+            <p className="text-xs text-muted-foreground">{t("plausibleApiKeyDesc")}</p>
+          </div>
+
           {/* OpenAI API Key */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
@@ -401,6 +460,42 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
             </Button>
           </div>
           <p className="text-xs text-muted-foreground">{t("digest.cronTip")}</p>
+        </CardContent>
+      </Card>
+
+      {/* Portfolio Page */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <Radio className="h-4 w-4" />
+            {t("portfolio.title")}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-muted-foreground">{t("portfolio.desc")}</p>
+
+          <div className="space-y-2">
+            <Label>{t("portfolio.url")}</Label>
+            <div className="flex gap-2">
+              <Input readOnly value={portfolioLoading ? t("cron.loading") : portfolioUrl}
+                className="font-mono text-xs" />
+              <Button variant="outline" size="icon" onClick={handleCopyPortfolioUrl} disabled={!portfolioUrl}>
+                {portfolioCopied ? <CheckCircle className="h-4 w-4 text-emerald-500" /> : <Copy className="h-4 w-4" />}
+              </Button>
+              <Button variant="outline" size="icon" onClick={handleRegenPortfolioToken} disabled={portfolioLoading}
+                title={t("portfolio.regenerate")}>
+                <RefreshCw className={`h-4 w-4 ${portfolioLoading ? "animate-spin" : ""}`} />
+              </Button>
+            </div>
+          </div>
+
+          {portfolioUrl && (
+            <a href={`/portfolio/${portfolioToken}`} target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs text-primary hover:underline">
+              <ExternalLink className="h-3 w-3" />
+              {t("portfolio.preview")}
+            </a>
+          )}
         </CardContent>
       </Card>
 

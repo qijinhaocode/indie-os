@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { projects, revenueEntries, timeLogs, integrations, uptimeHistory, kpiMetrics, kpiValues, milestones } from "@/db/schema";
+import { projects, revenueEntries, timeLogs, integrations, uptimeHistory, kpiMetrics, kpiValues, milestones, projectNotes } from "@/db/schema";
 import { eq, sql, desc, inArray } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -17,6 +17,8 @@ import { StripeIntegration } from "@/components/dashboard/stripe-integration";
 import { RevenueCatIntegration } from "@/components/dashboard/revenuecat-integration";
 import { LemonSqueezyIntegration } from "@/components/dashboard/lemonsqueezy-integration";
 import { PaddleIntegration } from "@/components/dashboard/paddle-integration";
+import { PlausibleIntegration } from "@/components/dashboard/plausible-integration";
+import { ProjectNotes } from "@/components/dashboard/project-notes";
 import { KpiTracker } from "@/components/dashboard/kpi-tracker";
 import { MilestoneLog } from "@/components/dashboard/milestone-log";
 import { ShareButton } from "./share-button";
@@ -123,6 +125,11 @@ export default async function ProjectDetailPage({
     .from(milestones)
     .where(eq(milestones.projectId, project.id))
     .orderBy(desc(milestones.occurredAt));
+
+  const noteRow = await db.query.projectNotes.findFirst({
+    where: eq(projectNotes.projectId, project.id),
+  });
+  const noteContent = noteRow?.content ?? "";
 
   const recentRevenue = await db
     .select()
@@ -320,6 +327,8 @@ export default async function ProjectDetailPage({
         <RevenueCatIntegration projectId={project.id} integrations={projectIntegrations} />
         <LemonSqueezyIntegration projectId={project.id} integrations={projectIntegrations} />
         <PaddleIntegration projectId={project.id} integrations={projectIntegrations} />
+        <PlausibleIntegration projectId={project.id} integrations={projectIntegrations} />
+        <ProjectNotes projectId={project.id} initialContent={noteContent} />
         <KpiTracker projectId={project.id} metrics={metricsWithValues} />
         <MilestoneLog projectId={project.id} milestones={projectMilestones} />
       </div>

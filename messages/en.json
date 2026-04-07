@@ -241,6 +241,15 @@
     "lemonsqueezyApiKeyDesc": "Used to fetch MRR and subscription data. Supports SaaS and digital product sales with built-in tax handling. Find it in Lemon Squeezy → Settings → API.",
     "paddleApiKey": "Paddle API Key",
     "paddleApiKeyDesc": "Used to fetch MRR and subscription data. Supports subscription SaaS with built-in tax handling. Find it in Paddle dashboard → Developer Tools → Authentication.",
+    "plausibleApiKey": "Plausible API Key",
+    "plausibleApiKeyDesc": "Create one in Plausible → Settings → API Keys. Used to read traffic stats.",
+    "portfolio": {
+      "title": "Public Portfolio Page",
+      "desc": "Showcase all your projects on a public page. Great for build-in-public sharing.",
+      "url": "Portfolio URL",
+      "regenerate": "Regenerate link",
+      "preview": "Preview portfolio"
+    },
     "openaiApiKey": "OpenAI API Key",
     "openaiApiKeyDesc": "Powers the AI Copilot. Uses gpt-4o-mini — very low cost per analysis.",
     "statusPage": {
@@ -427,5 +436,24 @@
       "INITIALIZING": "Initializing",
       "CANCELED": "Canceled"
     }
+  },
+  "plausible": {
+    "addDesc": "Enter your Plausible site domain (Site ID). Make sure to add your Plausible API Key in Settings.",
+    "siteIdLabel": "Site ID (domain)",
+    "baseUrlLabel": "Custom Plausible base URL",
+    "baseUrlHint": "Leave empty to use plausible.io. Fill in the full URL for self-hosted instances.",
+    "visitorsToday": "Visitors today",
+    "visitors30d": "Visitors (30d)",
+    "pageviews30d": "Pageviews (30d)",
+    "bounceRate": "Bounce rate",
+    "visitDuration": "Avg. visit duration"
+  },
+  "notes": {
+    "title": "Project Notes",
+    "placeholder": "Jot down ideas, progress, issues… Markdown is supported.",
+    "save": "Save",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "autosave": "Auto-saved 1.2 s after you stop typing"
   }
 }

@@ -74,7 +74,7 @@ export const integrations = sqliteTable("integrations", {
   projectId: integer("project_id")
     .notNull()
     .references(() => projects.id, { onDelete: "cascade" }),
-  type: text("type", { enum: ["github", "vercel", "stripe", "http", "revenuecat", "lemonsqueezy", "paddle"] }).notNull(),
+  type: text("type", { enum: ["github", "vercel", "stripe", "http", "revenuecat", "lemonsqueezy", "paddle", "plausible"] }).notNull(),
   config: text("config").notNull().default("{}"),
   cachedData: text("cached_data"),
   lastSyncedAt: text("last_synced_at"),
@@ -93,6 +93,15 @@ export const goals = sqliteTable("goals", {
   projectId: integer("project_id").references(() => projects.id, { onDelete: "cascade" }),
   deadline: text("deadline"),
   createdAt: text("created_at").default(sql`(datetime('now'))`),
+});
+
+export const projectNotes = sqliteTable("project_notes", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  projectId: integer("project_id")
+    .notNull()
+    .references(() => projects.id, { onDelete: "cascade" }),
+  content: text("content").notNull().default(""),
+  updatedAt: text("updated_at").default(sql`(datetime('now'))`),
 });
 
 export const kpiMetrics = sqliteTable("kpi_metrics", {
@@ -149,6 +158,7 @@ export type Integration = typeof integrations.$inferSelect;
 export type AppSetting = typeof appSettings.$inferSelect;
 export type Goal = typeof goals.$inferSelect;
 export type UptimeHistory = typeof uptimeHistory.$inferSelect;
+export type ProjectNote = typeof projectNotes.$inferSelect;
 export type KpiMetric = typeof kpiMetrics.$inferSelect;
 export type KpiValue = typeof kpiValues.$inferSelect;
 export type Milestone = typeof milestones.$inferSelect;

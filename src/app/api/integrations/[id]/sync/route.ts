@@ -5,6 +5,61 @@ import { eq, sql } from "drizzle-orm";
 import Stripe from "stripe";
 import { sendDownAlert } from "@/lib/notify";
 
+interface PlausibleData {
+  visitors30d: number;
+  pageviews30d: number;
+  bounceRate: number;
+  visitDuration: number; // seconds
+  visitorsToday: number;
+  syncedAt: string;
+}
+
+async function syncPlausible(
+  integration: { id: number; config: string },
+  apiKey: string
+): Promise<PlausibleData> {
+  const config = JSON.parse(integration.config) as {
+    siteId: string;
+    baseUrl?: string;
+  };
+
+  const base = (config.baseUrl ?? "https://plausible.io").replace(/\/$/, "");
+
+  async function query(period: string) {
+    const url = `${base}/api/v1/stats/aggregate?site_id=${encodeURIComponent(config.siteId)}&period=${period}&metrics=visitors,pageviews,bounce_rate,visit_duration`;
+    const res = await fetch(url, {
+      headers: { Authorization: `Bearer ${apiKey}` },
+      next: { revalidate: 0 },
+    });
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`Plausible API error ${res.status}: ${text}`);
+    }
+    return (await res.json()) as {
+      results: {
+        visitors?: { value: number };
+        pageviews?: { value: number };
+        bounce_rate?: { value: number };
+        visit_duration?: { value: number };
+      };
+    };
+  }
+
+  const [monthly, today] = await Promise.all([
+    query("30d"),
+    query("day").catch(() => ({ results: {} })),
+  ]);
+
+  return {
+    visitors30d: monthly.results.visitors?.value ?? 0,
+    pageviews30d: monthly.results.pageviews?.value ?? 0,
+    bounceRate: monthly.results.bounce_rate?.value ?? 0,
+    visitDuration: monthly.results.visit_duration?.value ?? 0,
+    visitorsToday: today.results.visitors?.value ?? 0,
+    syncedAt: new Date().toISOString(),
+  };
+}
+
 interface PaddleData {
   mrr: number;
   activeSubscriptions: number;
@@ -536,6 +591,17 @@ export async function POST(
           });
         }
       }
+    } else if (integration.type === "plausible") {
+      const tokenRow = await db.query.appSettings.findFirst({
+        where: eq(appSettings.key, "plausible_api_key"),
+      });
+      if (!tokenRow?.value) {
+        return NextResponse.json(
+          { error: "Plausible API key not configured. Go to Settings." },
+          { status: 400 }
+        );
+      }
+      cachedData = await syncPlausible(integration, tokenRow.value);
     } else if (integration.type === "paddle") {
       const tokenRow = await db.query.appSettings.findFirst({
         where: eq(appSettings.key, "paddle_api_key"),

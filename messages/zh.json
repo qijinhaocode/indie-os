@@ -241,6 +241,15 @@
     "lemonsqueezyApiKeyDesc": "用于拉取 MRR 和订阅数据。支持 SaaS、数字产品销售，自带税务处理。在 Lemon Squeezy 控制台 → Settings → API 获取。",
     "paddleApiKey": "Paddle API Key",
     "paddleApiKeyDesc": "用于拉取 MRR 和订阅数据。支持订阅制 SaaS，自带税务处理。在 Paddle 控制台 → Developer Tools → Authentication 获取。",
+    "plausibleApiKey": "Plausible API Key",
+    "plausibleApiKeyDesc": "从 Plausible 设置 → API Keys 中创建，用于读取流量数据",
+    "portfolio": {
+      "title": "公开 Portfolio 页",
+      "desc": "将你的所有项目以公开页面的形式展示，适合 build-in-public 分享",
+      "url": "Portfolio 页面地址",
+      "regenerate": "重新生成链接",
+      "preview": "预览 Portfolio 页面"
+    },
     "openaiApiKey": "OpenAI API Key",
     "openaiApiKeyDesc": "用于 AI Copilot 功能，分析你的项目数据并生成洞察建议。使用 gpt-4o-mini，成本极低。",
     "statusPage": {
@@ -427,5 +436,24 @@
       "INITIALIZING": "初始化中",
       "CANCELED": "已取消"
     }
+  },
+  "plausible": {
+    "addDesc": "输入你的 Plausible 站点域名（Site ID），需在设置中填写 Plausible API Key",
+    "siteIdLabel": "Site ID（域名）",
+    "baseUrlLabel": "自定义 Plausible 地址",
+    "baseUrlHint": "留空则默认使用 plausible.io，自托管实例请填写完整地址",
+    "visitorsToday": "今日访客",
+    "visitors30d": "30 天访客",
+    "pageviews30d": "30 天页面浏览",
+    "bounceRate": "跳出率",
+    "visitDuration": "平均访问时长"
+  },
+  "notes": {
+    "title": "项目笔记",
+    "placeholder": "在这里记录想法、进展、遇到的问题……支持 Markdown 语法",
+    "save": "保存",
+    "saving": "保存中…",
+    "saved": "已保存",
+    "autosave": "每次停止输入 1.2 秒后自动保存"
   }
 }
