@@ -1,0 +1,78 @@
+{
+  "nav": {
+    "overview": "Overview",
+    "projects": "Projects",
+    "services": "Services",
+    "revenue": "Revenue",
+    "time": "Time",
+    "settings": "Settings"
+  },
+  "overview": {
+    "title": "Overview",
+    "subtitle": "Your indie hacker control center",
+    "stats": {
+      "projects": "Projects",
+      "activeProjects": "active",
+      "totalMRR": "Total MRR",
+      "mrrSubtitle": "Monthly recurring revenue",
+      "timeThisMonth": "Time This Month",
+      "timeSubtitle": "Logged this month",
+      "avgROI": "Avg ROI",
+      "roiSubtitle": "Revenue per hour"
+    },
+    "recentProjects": "Recent Projects",
+    "serviceHealth": "Service Health",
+    "noProjects": "No projects yet.",
+    "addFirstProject": "Add your first project →",
+    "noServices": "No services configured.",
+    "addServices": "Add services to monitor →"
+  },
+  "projects": {
+    "title": "Projects",
+    "subtitle": "Unified project registry",
+    "addProject": "Add Project",
+    "noProjects": "No projects yet",
+    "noProjectsDesc": "Add your first project to start tracking status, revenue, and time investment.",
+    "status": {
+      "active": "Active",
+      "paused": "Paused",
+      "archived": "Archived",
+      "idea": "Idea"
+    },
+    "form": {
+      "title": "Add Project",
+      "name": "Project Name",
+      "namePlaceholder": "My Awesome SaaS",
+      "description": "Description",
+      "descriptionPlaceholder": "What does this project do?",
+      "status": "Status",
+      "techStack": "Tech Stack",
+      "techStackPlaceholder": "Next.js, Supabase",
+      "repo": "GitHub Repo",
+      "repoPlaceholder": "https://github.com/...",
+      "domain": "Domain",
+      "domainPlaceholder": "myapp.com",
+      "cancel": "Cancel",
+      "submit": "Add Project",
+      "submitting": "Adding..."
+    }
+  },
+  "services": {
+    "title": "Services",
+    "subtitle": "Infrastructure health monitoring",
+    "comingSoon": "Coming in Phase 1",
+    "comingSoonDesc": "Service health monitoring will be available soon. You'll be able to track Frontend, DB, Cron Jobs, and third-party service status."
+  },
+  "revenue": {
+    "title": "Revenue",
+    "subtitle": "MRR & revenue tracking",
+    "comingSoon": "Coming Soon",
+    "comingSoonDesc": "Track MRR, one-time revenue, and refunds for each project. Calculate ROI based on time invested."
+  },
+  "time": {
+    "title": "Time",
+    "subtitle": "Attention & time tracking",
+    "comingSoon": "Coming Soon",
+    "comingSoonDesc": "Log time spent on each project and correlate with revenue to understand your real ROI per project."
+  }
+}

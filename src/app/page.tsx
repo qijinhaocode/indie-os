@@ -1,65 +1,176 @@
-import Image from "next/image";
+import { db } from "@/db";
+import { projects, revenueEntries, timeLogs } from "@/db/schema";
+import { desc, eq, sql } from "drizzle-orm";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { formatCurrency, formatMinutes } from "@/lib/utils";
+import {
+  FolderKanban,
+  DollarSign,
+  Clock,
+  Activity,
+  TrendingUp,
+  AlertCircle,
+} from "lucide-react";
+import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
-export default function Home() {
+async function getStats() {
+  const allProjects = await db.select().from(projects).orderBy(desc(projects.updatedAt));
+  const activeCount = allProjects.filter((p) => p.status === "active").length;
+
+  const mrrResult = await db
+    .select({ total: sql<number>`coalesce(sum(${revenueEntries.amount}), 0)` })
+    .from(revenueEntries)
+    .where(eq(revenueEntries.type, "mrr"));
+  const totalMRR = mrrResult[0]?.total ?? 0;
+
+  const now = new Date();
+  const startOfMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`;
+  const monthlyTimeResult = await db
+    .select({ total: sql<number>`coalesce(sum(${timeLogs.minutes}), 0)` })
+    .from(timeLogs)
+    .where(sql`${timeLogs.loggedAt} >= ${startOfMonth}`);
+  const monthlyMinutes = monthlyTimeResult[0]?.total ?? 0;
+
+  return { projects: allProjects, totalProjects: allProjects.length, activeCount, totalMRR, monthlyMinutes };
+}
+
+const statusVariant = {
+  active: "success" as const,
+  paused: "warning" as const,
+  archived: "secondary" as const,
+  idea: "outline" as const,
+};
+
+export default async function DashboardPage() {
+  const t = await getTranslations("overview");
+  const tp = await getTranslations("projects");
+  const { projects: allProjects, totalProjects, activeCount, totalMRR, monthlyMinutes } = await getStats();
+  const recentProjects = allProjects.slice(0, 5);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+    <div className="p-6 space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
+        <p className="text-sm text-muted-foreground mt-1">{t("subtitle")}</p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              {t("stats.projects")}
+            </CardTitle>
+            <FolderKanban className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{totalProjects}</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {activeCount} {t("stats.activeProjects")}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              {t("stats.totalMRR")}
+            </CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{formatCurrency(totalMRR)}</div>
+            <p className="text-xs text-muted-foreground mt-1">{t("stats.mrrSubtitle")}</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              {t("stats.timeThisMonth")}
+            </CardTitle>
+            <Clock className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{formatMinutes(monthlyMinutes)}</div>
+            <p className="text-xs text-muted-foreground mt-1">{t("stats.timeSubtitle")}</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              {t("stats.avgROI")}
+            </CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {monthlyMinutes > 0
+                ? `${formatCurrency(totalMRR / (monthlyMinutes / 60))}/h`
+                : "—"}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">{t("stats.roiSubtitle")}</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">{t("recentProjects")}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-0">
+            {recentProjects.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <AlertCircle className="h-8 w-8 text-muted-foreground mb-2" />
+                <p className="text-sm text-muted-foreground">{t("noProjects")}</p>
+                <Link href="/projects" className="text-sm text-primary hover:underline mt-1">
+                  {t("addFirstProject")}
+                </Link>
+              </div>
+            ) : (
+              recentProjects.map((project) => (
+                <div
+                  key={project.id}
+                  className="flex items-center justify-between py-3 border-b border-border last:border-0"
+                >
+                  <div className="min-w-0">
+                    <Link
+                      href={`/projects/${project.id}`}
+                      className="text-sm font-medium hover:text-primary truncate block"
+                    >
+                      {project.name}
+                    </Link>
+                    {project.description && (
+                      <p className="text-xs text-muted-foreground truncate">{project.description}</p>
+                    )}
+                  </div>
+                  <Badge variant={statusVariant[project.status]} className="ml-3 shrink-0">
+                    {tp(`status.${project.status}`)}
+                  </Badge>
+                </div>
+              ))
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">{t("serviceHealth")}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col items-center justify-center py-8 text-center">
+              <Activity className="h-8 w-8 text-muted-foreground mb-2" />
+              <p className="text-sm text-muted-foreground">{t("noServices")}</p>
+              <Link href="/services" className="text-sm text-primary hover:underline mt-1">
+                {t("addServices")}
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
