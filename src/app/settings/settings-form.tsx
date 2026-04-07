@@ -19,6 +19,7 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
   const [githubToken, setGithubToken] = useState("");
   const [vercelToken, setVercelToken] = useState("");
   const [stripeSecretKey, setStripeSecretKey] = useState("");
+  const [revenuecatSecretKey, setRevenuecatSecretKey] = useState("");
   const [openaiApiKey, setOpenaiApiKey] = useState("");
   const [webhookUrl, setWebhookUrl] = useState("");
   const [telegramBotToken, setTelegramBotToken] = useState("");
@@ -102,6 +103,7 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
     if (githubToken) body["github_token"] = githubToken;
     if (vercelToken) body["vercel_token"] = vercelToken;
     if (stripeSecretKey) body["stripe_secret_key"] = stripeSecretKey;
+    if (revenuecatSecretKey) body["revenuecat_secret_key"] = revenuecatSecretKey;
     if (openaiApiKey) body["openai_api_key"] = openaiApiKey;
     if (webhookUrl) body["notify_webhook_url"] = webhookUrl;
     if (telegramBotToken) body["notify_telegram_token"] = telegramBotToken;
@@ -125,6 +127,7 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
     setGithubToken("");
     setVercelToken("");
     setStripeSecretKey("");
+    setRevenuecatSecretKey("");
     setOpenaiApiKey("");
     setWebhookUrl("");
     setTelegramBotToken("");
@@ -135,7 +138,7 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
     router.refresh();
   }
 
-  const hasChanges = !!(githubToken || vercelToken || stripeSecretKey || openaiApiKey || webhookUrl || telegramBotToken || telegramChatId || resendApiKey || digestEmail);
+  const hasChanges = !!(githubToken || vercelToken || stripeSecretKey || revenuecatSecretKey || openaiApiKey || webhookUrl || telegramBotToken || telegramChatId || resendApiKey || digestEmail);
 
   async function handleSendDigest() {
     setSendingDigest(true);
@@ -209,6 +212,25 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
               onChange={(e) => setStripeSecretKey(e.target.value)}
               placeholder={savedKeys["stripe_secret_key"] ? "••••••••••••••••" : t("stripeSecretKeyPlaceholder")} />
             <p className="text-xs text-muted-foreground">{t("stripeSecretKeyDesc")}</p>
+          </div>
+
+          {/* RevenueCat Secret Key */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="revenuecat-key" className="flex items-center gap-2">
+                {t("revenuecatSecretKey")}
+                {savedKeys["revenuecat_secret_key"] && <CheckCircle className="h-3.5 w-3.5 text-emerald-500" />}
+              </Label>
+              <a href="https://app.revenuecat.com/settings/api-keys"
+                target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-xs text-primary hover:underline">
+                {t("createToken")} <ExternalLink className="h-3 w-3" />
+              </a>
+            </div>
+            <Input id="revenuecat-key" type="password" value={revenuecatSecretKey}
+              onChange={(e) => setRevenuecatSecretKey(e.target.value)}
+              placeholder={savedKeys["revenuecat_secret_key"] ? "••••••••••••••••" : "sk_xxxxxxxxxxxx"} />
+            <p className="text-xs text-muted-foreground">{t("revenuecatSecretKeyDesc")}</p>
           </div>
 
           {/* OpenAI API Key */}

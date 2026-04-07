@@ -24,7 +24,8 @@
     "serviceHealth": "服务健康",
     "charts": {
       "revenueTitle": "近 6 个月收入",
-      "timeTitle": "本月各项目投入（小时）"
+      "timeTitle": "本月各项目投入（小时）",
+      "revenueSourceTitle": "收入来源分布"
     },
     "noProjects": "暂无项目",
     "addFirstProject": "添加你的第一个项目 →",
@@ -198,6 +199,8 @@
     "stripeSecretKey": "Stripe Secret Key",
     "stripeSecretKeyDesc": "用于拉取 MRR、订阅和收入数据。使用受限密钥（Restricted Key）仅授予 read 权限更安全。",
     "stripeSecretKeyPlaceholder": "sk_live_xxxxxxxxxxxx",
+    "revenuecatSecretKey": "RevenueCat Secret Key",
+    "revenuecatSecretKeyDesc": "用于拉取 App Store / Play Store 内购 MRR 和订阅数据。在 RevenueCat 控制台 → API Keys 获取。",
     "openaiApiKey": "OpenAI API Key",
     "openaiApiKeyDesc": "用于 AI Copilot 功能，分析你的项目数据并生成洞察建议。使用 gpt-4o-mini，成本极低。",
     "statusPage": {
@@ -273,6 +276,15 @@
     "last30Days": "近 30 天收入",
     "activeSubscriptions": "活跃订阅",
     "customers": "客户总数",
+    "autoLogged": "MRR 已自动写入收入记录"
+  },
+  "revenuecat": {
+    "addDesc": "使用 Settings 中填写的 RevenueCat Secret Key 拉取移动端内购数据。同步后 MRR 自动写入收入记录。",
+    "projectIdLabel": "RevenueCat 项目 ID",
+    "projectIdHint": "在 RevenueCat 控制台 URL 中找到：app.revenuecat.com/projects/{项目ID}",
+    "totalRevenue": "历史总收入",
+    "activeSubscriptions": "活跃订阅",
+    "activeTrials": "试用中",
     "autoLogged": "MRR 已自动写入收入记录"
   },
   "vercel": {

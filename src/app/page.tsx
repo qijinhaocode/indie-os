@@ -19,6 +19,7 @@ import { getTranslations } from "next-intl/server";
 import { AiCopilot } from "@/components/dashboard/ai-copilot";
 import { RevenueChart } from "@/components/dashboard/revenue-chart";
 import { TimeChart } from "@/components/dashboard/time-chart";
+import { RevenueSourceChart } from "@/components/dashboard/revenue-source-chart";
 
 interface HttpCachedData {
   status: "up" | "down" | "degraded";
@@ -88,6 +89,16 @@ async function getStats() {
     .orderBy(sql`sum(${timeLogs.minutes}) desc`)
     .limit(6);
 
+  // Revenue by source (all time)
+  const revenueBySource = await db
+    .select({
+      source: sql<string>`coalesce(${revenueEntries.source}, 'manual')`,
+      amount: sql<number>`coalesce(sum(${revenueEntries.amount}), 0)`,
+    })
+    .from(revenueEntries)
+    .groupBy(sql`coalesce(${revenueEntries.source}, 'manual')`)
+    .orderBy(sql`sum(${revenueEntries.amount}) desc`);
+
   const revenueChartData = revenueByMonth.map((r) => ({
     month: r.month,
     revenue: r.revenue,
@@ -100,6 +111,10 @@ async function getStats() {
       hours: +(t.minutes / 60).toFixed(1),
     }));
 
+  const revenueSourceData = revenueBySource
+    .filter((r) => r.amount > 0)
+    .map((r) => ({ source: r.source, amount: r.amount }));
+
   return {
     projects: allProjects,
     totalProjects: allProjects.length,
@@ -110,6 +125,7 @@ async function getStats() {
     hasOpenAiKey,
     revenueChartData,
     timeChartData,
+    revenueSourceData,
   };
 }
 
@@ -123,7 +139,7 @@ const statusVariant = {
 export default async function DashboardPage() {
   const t = await getTranslations("overview");
   const tp = await getTranslations("projects");
-  const { projects: allProjects, totalProjects, activeCount, totalMRR, monthlyMinutes, probesSummary, hasOpenAiKey, revenueChartData, timeChartData } = await getStats();
+  const { projects: allProjects, totalProjects, activeCount, totalMRR, monthlyMinutes, probesSummary, hasOpenAiKey, revenueChartData, timeChartData, revenueSourceData } = await getStats();
   const recentProjects = allProjects.slice(0, 5);
   const upCount = probesSummary.filter((p) => p.status === "up").length;
   const downCount = probesSummary.filter((p) => p.status === "down" || p.status === "degraded").length;
@@ -196,7 +212,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Charts */}
-      {(revenueChartData.length > 0 || timeChartData.length > 0) && (
+      {(revenueChartData.length > 0 || timeChartData.length > 0 || revenueSourceData.length > 1) && (
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {revenueChartData.length > 0 && (
             <Card>
@@ -209,6 +225,13 @@ export default async function DashboardPage() {
             <Card>
               <CardContent className="pt-5">
                 <TimeChart data={timeChartData} />
+              </CardContent>
+            </Card>
+          )}
+          {revenueSourceData.length > 1 && (
+            <Card>
+              <CardContent className="pt-5">
+                <RevenueSourceChart data={revenueSourceData} />
               </CardContent>
             </Card>
           )}

@@ -5,6 +5,60 @@ import { eq } from "drizzle-orm";
 import Stripe from "stripe";
 import { sendDownAlert } from "@/lib/notify";
 
+interface RevenueCatData {
+  mrr: number; // USD
+  activeSubscriptions: number;
+  activeTrials: number;
+  totalRevenue: number;
+  currency: string;
+  syncedAt: string;
+}
+
+async function syncRevenueCat(
+  integration: { id: number; config: string; projectId: number },
+  secretKey: string
+): Promise<RevenueCatData> {
+  const config = JSON.parse(integration.config) as { projectId: string };
+
+  const res = await fetch(
+    `https://api.revenuecat.com/v2/projects/${config.projectId}/metrics/overview`,
+    {
+      headers: {
+        Authorization: `Bearer ${secretKey}`,
+        "Content-Type": "application/json",
+      },
+      next: { revalidate: 0 },
+    }
+  );
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`RevenueCat API error ${res.status}: ${text}`);
+  }
+
+  const json = (await res.json()) as {
+    items?: Array<{ id: string; value: number }>;
+  };
+
+  const items = json.items ?? [];
+  const find = (id: string) =>
+    items.find((i) => i.id === id)?.value ?? 0;
+
+  const mrr = find("mrr");
+  const activeSubscriptions = find("active_subscriptions");
+  const activeTrials = find("active_trials");
+  const totalRevenue = find("revenue");
+
+  return {
+    mrr,
+    activeSubscriptions,
+    activeTrials,
+    totalRevenue,
+    currency: "USD",
+    syncedAt: new Date().toISOString(),
+  };
+}
+
 interface StripeData {
   mrr: number; // in cents
   currency: string;
@@ -292,6 +346,41 @@ export async function POST(
             currency: stripeData.currency.toUpperCase(),
             type: "mrr",
             source: "stripe-auto",
+            recordedAt: today,
+          });
+        }
+      }
+    } else if (integration.type === "revenuecat") {
+      const tokenRow = await db.query.appSettings.findFirst({
+        where: eq(appSettings.key, "revenuecat_secret_key"),
+      });
+      if (!tokenRow?.value) {
+        return NextResponse.json(
+          { error: "RevenueCat secret key not configured. Go to Settings." },
+          { status: 400 }
+        );
+      }
+      cachedData = await syncRevenueCat(integration, tokenRow.value);
+
+      // Auto-write MRR to revenue_entries if changed
+      const rcData = cachedData as RevenueCatData;
+      if (rcData.mrr > 0) {
+        const today = new Date().toISOString().split("T")[0];
+        const existing = await db.query.revenueEntries.findFirst({
+          where: (r, { and, eq: eqF }) =>
+            and(
+              eqF(r.projectId, integration.projectId),
+              eqF(r.source, "revenuecat-auto"),
+              eqF(r.recordedAt, today)
+            ),
+        });
+        if (!existing) {
+          await db.insert(revenueEntries).values({
+            projectId: integration.projectId,
+            amount: rcData.mrr,
+            currency: rcData.currency,
+            type: "mrr",
+            source: "revenuecat-auto",
             recordedAt: today,
           });
         }

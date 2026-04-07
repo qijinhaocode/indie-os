@@ -24,7 +24,8 @@
     "serviceHealth": "Service Health",
     "charts": {
       "revenueTitle": "Revenue (last 6 months)",
-      "timeTitle": "Time by project this month (hours)"
+      "timeTitle": "Time by project this month (hours)",
+      "revenueSourceTitle": "Revenue by source"
     },
     "noProjects": "No projects yet.",
     "addFirstProject": "Add your first project →",
@@ -198,6 +199,8 @@
     "stripeSecretKey": "Stripe Secret Key",
     "stripeSecretKeyDesc": "Used to fetch MRR, subscriptions, and revenue. Use a Restricted Key with read-only permissions for security.",
     "stripeSecretKeyPlaceholder": "sk_live_xxxxxxxxxxxx",
+    "revenuecatSecretKey": "RevenueCat Secret Key",
+    "revenuecatSecretKeyDesc": "Used to fetch App Store / Play Store in-app purchase MRR and subscription data. Find it in RevenueCat dashboard → API Keys.",
     "openaiApiKey": "OpenAI API Key",
     "openaiApiKeyDesc": "Powers the AI Copilot. Uses gpt-4o-mini — very low cost per analysis.",
     "statusPage": {
@@ -273,6 +276,15 @@
     "last30Days": "Last 30 Days",
     "activeSubscriptions": "Active Subscriptions",
     "customers": "Total Customers",
+    "autoLogged": "MRR auto-logged to revenue"
+  },
+  "revenuecat": {
+    "addDesc": "Uses the RevenueCat Secret Key from Settings to pull mobile in-app purchase data. MRR is automatically logged to revenue on each sync.",
+    "projectIdLabel": "RevenueCat Project ID",
+    "projectIdHint": "Find it in the RevenueCat dashboard URL: app.revenuecat.com/projects/{projectId}",
+    "totalRevenue": "All-time Revenue",
+    "activeSubscriptions": "Active Subscriptions",
+    "activeTrials": "Active Trials",
     "autoLogged": "MRR auto-logged to revenue"
   },
   "vercel": {

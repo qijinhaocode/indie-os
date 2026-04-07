@@ -14,6 +14,7 @@ import { GithubIntegration } from "@/components/dashboard/github-integration";
 import { VercelIntegration } from "@/components/dashboard/vercel-integration";
 import { HttpProbeIntegration } from "@/components/dashboard/http-probe-integration";
 import { StripeIntegration } from "@/components/dashboard/stripe-integration";
+import { RevenueCatIntegration } from "@/components/dashboard/revenuecat-integration";
 import { ShareButton } from "./share-button";
 
 const statusVariant = {
@@ -255,6 +256,7 @@ export default async function ProjectDetailPage({
         <VercelIntegration projectId={project.id} integrations={projectIntegrations} />
         <HttpProbeIntegration projectId={project.id} integrations={projectIntegrations} />
         <StripeIntegration projectId={project.id} integrations={projectIntegrations} />
+        <RevenueCatIntegration projectId={project.id} integrations={projectIntegrations} />
       </div>
     </div>
   );
