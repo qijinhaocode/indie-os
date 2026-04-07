@@ -154,6 +154,9 @@
     "vercelToken": "Vercel Token",
     "vercelTokenDesc": "用于拉取部署状态和项目信息。",
     "vercelTokenPlaceholder": "xxxxxxxxxxxxxxxxxxxxxxxx",
+    "stripeSecretKey": "Stripe Secret Key",
+    "stripeSecretKeyDesc": "用于拉取 MRR、订阅和收入数据。使用受限密钥（Restricted Key）仅授予 read 权限更安全。",
+    "stripeSecretKeyPlaceholder": "sk_live_xxxxxxxxxxxx",
     "save": "保存",
     "saving": "保存中...",
     "saved": "已保存",
@@ -179,6 +182,24 @@
     "deleteConfirm": "确认删除这个集成？",
     "enabled": "已启用",
     "disabled": "已禁用"
+  },
+  "http": {
+    "title": "HTTP 健康探针",
+    "label": "名称",
+    "labelPlaceholder": "API 服务、前端...",
+    "url": "URL",
+    "method": "请求方法",
+    "expectedStatus": "期望状态码",
+    "up": "正常",
+    "degraded": "异常响应",
+    "down": "不可达"
+  },
+  "stripe": {
+    "addDesc": "使用 Settings 页面中填写的 Stripe Secret Key 拉取数据。同步后 MRR 会自动写入收入记录。",
+    "last30Days": "近 30 天收入",
+    "activeSubscriptions": "活跃订阅",
+    "customers": "客户总数",
+    "autoLogged": "MRR 已自动写入收入记录"
   },
   "vercel": {
     "latestDeployment": "最新部署",

@@ -18,6 +18,7 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
   const router = useRouter();
   const [githubToken, setGithubToken] = useState("");
   const [vercelToken, setVercelToken] = useState("");
+  const [stripeSecretKey, setStripeSecretKey] = useState("");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -26,6 +27,7 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
     const body: Record<string, string> = {};
     if (githubToken) body["github_token"] = githubToken;
     if (vercelToken) body["vercel_token"] = vercelToken;
+    if (stripeSecretKey) body["stripe_secret_key"] = stripeSecretKey;
 
     if (Object.keys(body).length === 0) {
       setSaving(false);
@@ -42,6 +44,7 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
     setSaved(true);
     setGithubToken("");
     setVercelToken("");
+    setStripeSecretKey("");
     setTimeout(() => setSaved(false), 3000);
     router.refresh();
   }
@@ -104,7 +107,36 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
             <p className="text-xs text-muted-foreground">{t("vercelTokenDesc")}</p>
           </div>
 
-          <Button onClick={handleSave} disabled={saving || (!githubToken && !vercelToken)}>
+          {/* Stripe Secret Key */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="stripe-secret-key" className="flex items-center gap-2">
+                {t("stripeSecretKey")}
+                {savedKeys["stripe_secret_key"] && (
+                  <CheckCircle className="h-3.5 w-3.5 text-emerald-500" />
+                )}
+              </Label>
+              <a
+                href="https://dashboard.stripe.com/apikeys"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+              >
+                {t("createToken")}
+                <ExternalLink className="h-3 w-3" />
+              </a>
+            </div>
+            <Input
+              id="stripe-secret-key"
+              type="password"
+              value={stripeSecretKey}
+              onChange={(e) => setStripeSecretKey(e.target.value)}
+              placeholder={savedKeys["stripe_secret_key"] ? "••••••••••••••••" : t("stripeSecretKeyPlaceholder")}
+            />
+            <p className="text-xs text-muted-foreground">{t("stripeSecretKeyDesc")}</p>
+          </div>
+
+          <Button onClick={handleSave} disabled={saving || (!githubToken && !vercelToken && !stripeSecretKey)}>
             {saved ? t("saved") : saving ? t("saving") : t("save")}
           </Button>
         </CardContent>

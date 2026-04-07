@@ -12,6 +12,8 @@ import { EditProjectForm } from "./edit-project-form";
 import { DeleteProjectButton } from "./delete-project-button";
 import { GithubIntegration } from "@/components/dashboard/github-integration";
 import { VercelIntegration } from "@/components/dashboard/vercel-integration";
+import { HttpProbeIntegration } from "@/components/dashboard/http-probe-integration";
+import { StripeIntegration } from "@/components/dashboard/stripe-integration";
 
 const statusVariant = {
   active: "success" as const,
@@ -249,6 +251,8 @@ export default async function ProjectDetailPage({
 
         <GithubIntegration projectId={project.id} integrations={projectIntegrations} />
         <VercelIntegration projectId={project.id} integrations={projectIntegrations} />
+        <HttpProbeIntegration projectId={project.id} integrations={projectIntegrations} />
+        <StripeIntegration projectId={project.id} integrations={projectIntegrations} />
       </div>
     </div>
   );
