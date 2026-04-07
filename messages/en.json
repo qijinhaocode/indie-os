@@ -5,6 +5,7 @@
     "services": "Services",
     "revenue": "Revenue",
     "time": "Time",
+    "goals": "Goals",
     "settings": "Settings"
   },
   "overview": {
@@ -34,7 +35,41 @@
     "viewAll": "View all",
     "servicesUp": "services up",
     "servicesDown": "services down",
-    "serviceAlert": "Some services are unreachable — check immediately"
+    "serviceAlert": "Some services are unreachable — check immediately",
+    "goals": {
+      "title": "Goals"
+    }
+  },
+  "goals": {
+    "title": "Goals",
+    "subtitle": "Set MRR, revenue, and time targets — track progress in real time",
+    "addGoal": "Add Goal",
+    "newGoal": "New Goal",
+    "empty": "No goals yet. Set your first target.",
+    "addFirst": "Add a goal →",
+    "inProgress": "In Progress",
+    "completed": "Achieved",
+    "deleteConfirm": "Delete this goal?",
+    "daysLeft": "{days} days left",
+    "overdue": "Overdue by {days} days",
+    "type": {
+      "mrr": "MRR Goal",
+      "revenue_month": "Monthly Revenue Goal",
+      "time_month": "Monthly Time Goal",
+      "time_total": "All-time Time Goal"
+    },
+    "form": {
+      "title": "Goal name",
+      "titlePlaceholder": "Reach $1000 MRR, 40 hours this month...",
+      "type": "Type",
+      "target": "Target",
+      "project": "Project",
+      "allProjects": "All projects (global)",
+      "deadline": "Deadline",
+      "add": "Add",
+      "adding": "Adding...",
+      "cancel": "Cancel"
+    }
   },
   "projects": {
     "title": "Projects",
@@ -201,6 +236,8 @@
     "stripeSecretKeyPlaceholder": "sk_live_xxxxxxxxxxxx",
     "revenuecatSecretKey": "RevenueCat Secret Key",
     "revenuecatSecretKeyDesc": "Used to fetch App Store / Play Store in-app purchase MRR and subscription data. Find it in RevenueCat dashboard → API Keys.",
+    "lemonsqueezyApiKey": "Lemon Squeezy API Key",
+    "lemonsqueezyApiKeyDesc": "Used to fetch MRR and subscription data. Supports SaaS and digital product sales with built-in tax handling. Find it in Lemon Squeezy → Settings → API.",
     "openaiApiKey": "OpenAI API Key",
     "openaiApiKeyDesc": "Powers the AI Copilot. Uses gpt-4o-mini — very low cost per analysis.",
     "statusPage": {
@@ -276,6 +313,15 @@
     "last30Days": "Last 30 Days",
     "activeSubscriptions": "Active Subscriptions",
     "customers": "Total Customers",
+    "autoLogged": "MRR auto-logged to revenue"
+  },
+  "lemonsqueezy": {
+    "addDesc": "Uses the Lemon Squeezy API Key from Settings to pull subscription data. MRR is automatically logged to revenue on each sync.",
+    "storeIdLabel": "Store ID (optional)",
+    "storeIdHint": "Find your Store ID in Lemon Squeezy → Stores. Leave blank to fetch data across all stores in your account.",
+    "totalRevenue": "All-time Revenue",
+    "activeSubscriptions": "Active Subscriptions",
+    "totalOrders": "Total Orders",
     "autoLogged": "MRR auto-logged to revenue"
   },
   "revenuecat": {

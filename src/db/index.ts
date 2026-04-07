@@ -14,6 +14,24 @@ sqlite.pragma("foreign_keys = ON");
 // Incremental migrations — safe to re-run on every startup
 const migrations = [
   "ALTER TABLE projects ADD COLUMN share_token TEXT",
+  `CREATE TABLE IF NOT EXISTS goals (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    type TEXT NOT NULL,
+    target_value REAL NOT NULL,
+    unit TEXT NOT NULL DEFAULT 'USD',
+    project_id INTEGER REFERENCES projects(id) ON DELETE CASCADE,
+    deadline TEXT,
+    created_at TEXT DEFAULT (datetime('now'))
+  )`,
+  `CREATE TABLE IF NOT EXISTS uptime_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    integration_id INTEGER NOT NULL REFERENCES integrations(id) ON DELETE CASCADE,
+    status TEXT NOT NULL,
+    status_code INTEGER,
+    response_time_ms INTEGER,
+    checked_at TEXT NOT NULL
+  )`,
 ];
 
 for (const stmt of migrations) {

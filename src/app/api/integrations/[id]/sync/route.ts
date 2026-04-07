@@ -1,9 +1,83 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
-import { integrations, appSettings, revenueEntries, projects } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { integrations, appSettings, revenueEntries, projects, uptimeHistory } from "@/db/schema";
+import { eq, sql } from "drizzle-orm";
 import Stripe from "stripe";
 import { sendDownAlert } from "@/lib/notify";
+
+interface LemonSqueezyData {
+  mrr: number; // USD (cents already converted to dollars)
+  activeSubscriptions: number;
+  totalCustomers: number;
+  totalRevenue: number;
+  currency: string;
+  syncedAt: string;
+}
+
+async function syncLemonSqueezy(
+  integration: { id: number; config: string; projectId: number },
+  apiKey: string
+): Promise<LemonSqueezyData> {
+  const config = JSON.parse(integration.config) as { storeId?: string };
+
+  const headers = {
+    Authorization: `Bearer ${apiKey}`,
+    Accept: "application/vnd.api+json",
+  };
+
+  // Fetch active subscriptions
+  const subUrl = config.storeId
+    ? `https://api.lemonsqueezy.com/v1/subscriptions?filter[store_id]=${config.storeId}&filter[status]=active&page[size]=100`
+    : `https://api.lemonsqueezy.com/v1/subscriptions?filter[status]=active&page[size]=100`;
+
+  const subRes = await fetch(subUrl, { headers, next: { revalidate: 0 } });
+  if (!subRes.ok) {
+    const text = await subRes.text();
+    throw new Error(`Lemon Squeezy API error ${subRes.status}: ${text}`);
+  }
+  const subJson = (await subRes.json()) as {
+    data: Array<{
+      attributes: {
+        status: string;
+        mrr: number; // in cents
+        currency: string;
+      };
+    }>;
+    meta?: { page?: { total?: number } };
+  };
+
+  const activeSubs = subJson.data ?? [];
+  const totalMrrCents = activeSubs.reduce((s, sub) => s + (sub.attributes.mrr ?? 0), 0);
+  const currency = activeSubs[0]?.attributes.currency ?? "USD";
+
+  // Fetch orders for total revenue
+  const ordersUrl = config.storeId
+    ? `https://api.lemonsqueezy.com/v1/orders?filter[store_id]=${config.storeId}&page[size]=1`
+    : `https://api.lemonsqueezy.com/v1/orders?page[size]=1`;
+
+  let totalRevenueCents = 0;
+  let totalCustomers = 0;
+  try {
+    const ordersRes = await fetch(ordersUrl, { headers, next: { revalidate: 0 } });
+    if (ordersRes.ok) {
+      const ordersJson = (await ordersRes.json()) as {
+        meta?: { page?: { total?: number } };
+      };
+      totalCustomers = ordersJson.meta?.page?.total ?? 0;
+    }
+  } catch {
+    // non-critical
+  }
+
+  return {
+    mrr: totalMrrCents / 100,
+    activeSubscriptions: activeSubs.length,
+    totalCustomers,
+    totalRevenue: totalRevenueCents / 100,
+    currency,
+    syncedAt: new Date().toISOString(),
+  };
+}
 
 interface RevenueCatData {
   mrr: number; // USD
@@ -288,6 +362,31 @@ export async function POST(
       cachedData = await syncHttp(integration);
       const httpResult = cachedData as { status: string; statusCode: number | null; error: string | null };
 
+      // Write uptime history record
+      await db.insert(uptimeHistory).values({
+        integrationId: parseInt(id),
+        status: httpResult.status as "up" | "degraded" | "down",
+        statusCode: httpResult.statusCode,
+        responseTimeMs: (cachedData as { responseTimeMs: number }).responseTimeMs,
+        checkedAt: new Date().toISOString(),
+      });
+
+      // Prune old records — keep last 90 per integration
+      const oldest = await db
+        .select({ id: uptimeHistory.id })
+        .from(uptimeHistory)
+        .where(eq(uptimeHistory.integrationId, parseInt(id)))
+        .orderBy(sql`${uptimeHistory.checkedAt} desc`)
+        .offset(90)
+        .limit(1);
+      if (oldest.length > 0) {
+        await db
+          .delete(uptimeHistory)
+          .where(
+            sql`${uptimeHistory.integrationId} = ${parseInt(id)} AND ${uptimeHistory.id} <= ${oldest[0].id}`
+          );
+      }
+
       // Notify only when transitioning into "down" or "degraded"
       if (
         httpResult.status !== "up" &&
@@ -346,6 +445,41 @@ export async function POST(
             currency: stripeData.currency.toUpperCase(),
             type: "mrr",
             source: "stripe-auto",
+            recordedAt: today,
+          });
+        }
+      }
+    } else if (integration.type === "lemonsqueezy") {
+      const tokenRow = await db.query.appSettings.findFirst({
+        where: eq(appSettings.key, "lemonsqueezy_api_key"),
+      });
+      if (!tokenRow?.value) {
+        return NextResponse.json(
+          { error: "Lemon Squeezy API key not configured. Go to Settings." },
+          { status: 400 }
+        );
+      }
+      cachedData = await syncLemonSqueezy(integration, tokenRow.value);
+
+      // Auto-write MRR to revenue_entries if changed
+      const lsData = cachedData as LemonSqueezyData;
+      if (lsData.mrr > 0) {
+        const today = new Date().toISOString().split("T")[0];
+        const existing = await db.query.revenueEntries.findFirst({
+          where: (r, { and, eq: eqF }) =>
+            and(
+              eqF(r.projectId, integration.projectId),
+              eqF(r.source, "lemonsqueezy-auto"),
+              eqF(r.recordedAt, today)
+            ),
+        });
+        if (!existing) {
+          await db.insert(revenueEntries).values({
+            projectId: integration.projectId,
+            amount: lsData.mrr,
+            currency: lsData.currency,
+            type: "mrr",
+            source: "lemonsqueezy-auto",
             recordedAt: today,
           });
         }

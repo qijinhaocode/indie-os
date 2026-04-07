@@ -20,6 +20,7 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
   const [vercelToken, setVercelToken] = useState("");
   const [stripeSecretKey, setStripeSecretKey] = useState("");
   const [revenuecatSecretKey, setRevenuecatSecretKey] = useState("");
+  const [lemonsqueezyApiKey, setLemonsqueezyApiKey] = useState("");
   const [openaiApiKey, setOpenaiApiKey] = useState("");
   const [webhookUrl, setWebhookUrl] = useState("");
   const [telegramBotToken, setTelegramBotToken] = useState("");
@@ -104,6 +105,7 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
     if (vercelToken) body["vercel_token"] = vercelToken;
     if (stripeSecretKey) body["stripe_secret_key"] = stripeSecretKey;
     if (revenuecatSecretKey) body["revenuecat_secret_key"] = revenuecatSecretKey;
+    if (lemonsqueezyApiKey) body["lemonsqueezy_api_key"] = lemonsqueezyApiKey;
     if (openaiApiKey) body["openai_api_key"] = openaiApiKey;
     if (webhookUrl) body["notify_webhook_url"] = webhookUrl;
     if (telegramBotToken) body["notify_telegram_token"] = telegramBotToken;
@@ -128,6 +130,7 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
     setVercelToken("");
     setStripeSecretKey("");
     setRevenuecatSecretKey("");
+    setLemonsqueezyApiKey("");
     setOpenaiApiKey("");
     setWebhookUrl("");
     setTelegramBotToken("");
@@ -138,7 +141,7 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
     router.refresh();
   }
 
-  const hasChanges = !!(githubToken || vercelToken || stripeSecretKey || revenuecatSecretKey || openaiApiKey || webhookUrl || telegramBotToken || telegramChatId || resendApiKey || digestEmail);
+  const hasChanges = !!(githubToken || vercelToken || stripeSecretKey || revenuecatSecretKey || lemonsqueezyApiKey || openaiApiKey || webhookUrl || telegramBotToken || telegramChatId || resendApiKey || digestEmail);
 
   async function handleSendDigest() {
     setSendingDigest(true);
@@ -231,6 +234,25 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
               onChange={(e) => setRevenuecatSecretKey(e.target.value)}
               placeholder={savedKeys["revenuecat_secret_key"] ? "••••••••••••••••" : "sk_xxxxxxxxxxxx"} />
             <p className="text-xs text-muted-foreground">{t("revenuecatSecretKeyDesc")}</p>
+          </div>
+
+          {/* Lemon Squeezy API Key */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="ls-key" className="flex items-center gap-2">
+                {t("lemonsqueezyApiKey")}
+                {savedKeys["lemonsqueezy_api_key"] && <CheckCircle className="h-3.5 w-3.5 text-emerald-500" />}
+              </Label>
+              <a href="https://app.lemonsqueezy.com/settings/api"
+                target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-xs text-primary hover:underline">
+                {t("createToken")} <ExternalLink className="h-3 w-3" />
+              </a>
+            </div>
+            <Input id="ls-key" type="password" value={lemonsqueezyApiKey}
+              onChange={(e) => setLemonsqueezyApiKey(e.target.value)}
+              placeholder={savedKeys["lemonsqueezy_api_key"] ? "••••••••••••••••" : "eyJ0eXAiOiJKV1QiLCJhbGci..."} />
+            <p className="text-xs text-muted-foreground">{t("lemonsqueezyApiKeyDesc")}</p>
           </div>
 
           {/* OpenAI API Key */}

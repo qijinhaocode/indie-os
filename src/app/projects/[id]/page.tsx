@@ -1,6 +1,6 @@
 import { db } from "@/db";
-import { projects, revenueEntries, timeLogs, integrations } from "@/db/schema";
-import { eq, sql, desc } from "drizzle-orm";
+import { projects, revenueEntries, timeLogs, integrations, uptimeHistory } from "@/db/schema";
+import { eq, sql, desc, inArray } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +15,7 @@ import { VercelIntegration } from "@/components/dashboard/vercel-integration";
 import { HttpProbeIntegration } from "@/components/dashboard/http-probe-integration";
 import { StripeIntegration } from "@/components/dashboard/stripe-integration";
 import { RevenueCatIntegration } from "@/components/dashboard/revenuecat-integration";
+import { LemonSqueezyIntegration } from "@/components/dashboard/lemonsqueezy-integration";
 import { ShareButton } from "./share-button";
 
 const statusVariant = {
@@ -62,6 +63,37 @@ export default async function ProjectDetailPage({
     .select()
     .from(integrations)
     .where(eq(integrations.projectId, project.id));
+
+  // Fetch uptime history for HTTP probes
+  const httpProbeIds = projectIntegrations
+    .filter((i) => i.type === "http")
+    .map((i) => i.id);
+
+  const historyByIntegration: Record<number, { status: string; checkedAt: string }[]> = {};
+  if (httpProbeIds.length > 0) {
+    const rows = await db
+      .select({
+        integrationId: uptimeHistory.integrationId,
+        status: uptimeHistory.status,
+        checkedAt: uptimeHistory.checkedAt,
+      })
+      .from(uptimeHistory)
+      .where(inArray(uptimeHistory.integrationId, httpProbeIds))
+      .orderBy(desc(uptimeHistory.checkedAt))
+      .limit(httpProbeIds.length * 90);
+
+    for (const row of rows) {
+      if (!historyByIntegration[row.integrationId]) {
+        historyByIntegration[row.integrationId] = [];
+      }
+      if (historyByIntegration[row.integrationId].length < 90) {
+        historyByIntegration[row.integrationId].push({
+          status: row.status,
+          checkedAt: row.checkedAt,
+        });
+      }
+    }
+  }
 
   const recentRevenue = await db
     .select()
@@ -254,9 +286,10 @@ export default async function ProjectDetailPage({
 
         <GithubIntegration projectId={project.id} integrations={projectIntegrations} />
         <VercelIntegration projectId={project.id} integrations={projectIntegrations} />
-        <HttpProbeIntegration projectId={project.id} integrations={projectIntegrations} />
+        <HttpProbeIntegration projectId={project.id} integrations={projectIntegrations} uptimeHistoryByIntegration={historyByIntegration} />
         <StripeIntegration projectId={project.id} integrations={projectIntegrations} />
         <RevenueCatIntegration projectId={project.id} integrations={projectIntegrations} />
+        <LemonSqueezyIntegration projectId={project.id} integrations={projectIntegrations} />
       </div>
     </div>
   );

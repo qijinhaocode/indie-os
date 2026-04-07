@@ -5,6 +5,7 @@
     "services": "服务",
     "revenue": "收入",
     "time": "时间",
+    "goals": "目标",
     "settings": "设置"
   },
   "overview": {
@@ -34,7 +35,41 @@
     "viewAll": "查看全部",
     "servicesUp": "服务正常",
     "servicesDown": "服务异常",
-    "serviceAlert": "部分服务不可达，请立即检查"
+    "serviceAlert": "部分服务不可达，请立即检查",
+    "goals": {
+      "title": "目标"
+    }
+  },
+  "goals": {
+    "title": "目标追踪",
+    "subtitle": "设定 MRR、收入和时间目标，实时查看进度",
+    "addGoal": "添加目标",
+    "newGoal": "新建目标",
+    "empty": "还没有目标，设定你的第一个目标吧",
+    "addFirst": "添加目标 →",
+    "inProgress": "进行中",
+    "completed": "已达成",
+    "deleteConfirm": "确认删除这个目标？",
+    "daysLeft": "还有 {days} 天",
+    "overdue": "已逾期 {days} 天",
+    "type": {
+      "mrr": "MRR 目标",
+      "revenue_month": "本月收入目标",
+      "time_month": "本月时间目标",
+      "time_total": "累计时间目标"
+    },
+    "form": {
+      "title": "目标名称",
+      "titlePlaceholder": "达到 $1000 MRR、本月开发 40 小时...",
+      "type": "类型",
+      "target": "目标值",
+      "project": "关联项目",
+      "allProjects": "所有项目（全局）",
+      "deadline": "截止日期",
+      "add": "添加",
+      "adding": "添加中...",
+      "cancel": "取消"
+    }
   },
   "projects": {
     "title": "项目",
@@ -201,6 +236,8 @@
     "stripeSecretKeyPlaceholder": "sk_live_xxxxxxxxxxxx",
     "revenuecatSecretKey": "RevenueCat Secret Key",
     "revenuecatSecretKeyDesc": "用于拉取 App Store / Play Store 内购 MRR 和订阅数据。在 RevenueCat 控制台 → API Keys 获取。",
+    "lemonsqueezyApiKey": "Lemon Squeezy API Key",
+    "lemonsqueezyApiKeyDesc": "用于拉取 MRR 和订阅数据。支持 SaaS、数字产品销售，自带税务处理。在 Lemon Squeezy 控制台 → Settings → API 获取。",
     "openaiApiKey": "OpenAI API Key",
     "openaiApiKeyDesc": "用于 AI Copilot 功能，分析你的项目数据并生成洞察建议。使用 gpt-4o-mini，成本极低。",
     "statusPage": {
@@ -276,6 +313,15 @@
     "last30Days": "近 30 天收入",
     "activeSubscriptions": "活跃订阅",
     "customers": "客户总数",
+    "autoLogged": "MRR 已自动写入收入记录"
+  },
+  "lemonsqueezy": {
+    "addDesc": "使用 Settings 中填写的 Lemon Squeezy API Key 拉取订阅数据。同步后 MRR 自动写入收入记录。",
+    "storeIdLabel": "Store ID（可选）",
+    "storeIdHint": "在 Lemon Squeezy 控制台 → Stores 找到 Store ID。不填则拉取账户下所有 Store 的数据。",
+    "totalRevenue": "历史总收入",
+    "activeSubscriptions": "活跃订阅",
+    "totalOrders": "历史订单数",
     "autoLogged": "MRR 已自动写入收入记录"
   },
   "revenuecat": {

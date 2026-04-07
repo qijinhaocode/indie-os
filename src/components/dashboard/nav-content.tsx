@@ -13,6 +13,7 @@ import {
   Settings,
   Zap,
   Languages,
+  Target,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { setLocale } from "@/actions/locale";
@@ -34,6 +35,7 @@ export function NavContent({ onLinkClick }: NavContentProps) {
     { href: "/services", label: t("services"), icon: Activity },
     { href: "/revenue", label: t("revenue"), icon: DollarSign },
     { href: "/time", label: t("time"), icon: Clock },
+    { href: "/goals", label: t("goals"), icon: Target },
   ];
 
   function switchLocale() {

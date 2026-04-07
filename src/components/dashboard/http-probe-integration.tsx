@@ -33,12 +33,49 @@ const statusVariant: Record<HttpData["status"], "success" | "warning" | "danger"
   down: "danger",
 };
 
+interface UptimeDot {
+  status: string;
+  checkedAt: string;
+}
+
 interface HttpProbeIntegrationProps {
   projectId: number;
   integrations: Integration[];
+  uptimeHistoryByIntegration?: Record<number, UptimeDot[]>;
 }
 
-export function HttpProbeIntegration({ projectId, integrations }: HttpProbeIntegrationProps) {
+function UptimeDots({ history }: { history: UptimeDot[] }) {
+  if (history.length === 0) return null;
+  const dots = [...history].reverse(); // oldest first
+  const upCount = history.filter((h) => h.status === "up").length;
+  const uptimePct = history.length > 0 ? Math.round((upCount / history.length) * 100) : 100;
+
+  return (
+    <div className="space-y-1">
+      <div className="flex gap-0.5 flex-wrap">
+        {dots.map((d, i) => (
+          <div
+            key={i}
+            title={`${d.status} · ${new Date(d.checkedAt).toLocaleString()}`}
+            className={cn(
+              "h-3 w-3 rounded-sm",
+              d.status === "up"
+                ? "bg-emerald-500"
+                : d.status === "degraded"
+                ? "bg-amber-400"
+                : "bg-red-500"
+            )}
+          />
+        ))}
+      </div>
+      <p className="text-xs text-muted-foreground">
+        {uptimePct}% uptime · {history.length} checks
+      </p>
+    </div>
+  );
+}
+
+export function HttpProbeIntegration({ projectId, integrations, uptimeHistoryByIntegration = {} }: HttpProbeIntegrationProps) {
   const ti = useTranslations("integrations");
   const th = useTranslations("http");
   const ts = useTranslations("services");
@@ -174,22 +211,27 @@ export function HttpProbeIntegration({ projectId, integrations }: HttpProbeInteg
               <p className="text-xs text-muted-foreground truncate">{config.url}</p>
 
               {data ? (
-                <div className="flex items-center gap-3 flex-wrap">
-                  <Badge variant={statusVariant[data.status]}>
-                    {data.status === "up" ? th("up") : data.status === "degraded" ? th("degraded") : th("down")}
-                  </Badge>
-                  {data.statusCode && (
-                    <span className="text-xs text-muted-foreground">HTTP {data.statusCode}</span>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <Badge variant={statusVariant[data.status]}>
+                      {data.status === "up" ? th("up") : data.status === "degraded" ? th("degraded") : th("down")}
+                    </Badge>
+                    {data.statusCode && (
+                      <span className="text-xs text-muted-foreground">HTTP {data.statusCode}</span>
+                    )}
+                    {data.responseTimeMs !== null && (
+                      <span className="text-xs text-muted-foreground">{data.responseTimeMs}ms</span>
+                    )}
+                    {data.error && (
+                      <span className="text-xs text-destructive truncate max-w-48">{data.error}</span>
+                    )}
+                    <span className="text-xs text-muted-foreground ml-auto">
+                      {new Date(data.checkedAt).toLocaleString()}
+                    </span>
+                  </div>
+                  {uptimeHistoryByIntegration[integration.id]?.length > 0 && (
+                    <UptimeDots history={uptimeHistoryByIntegration[integration.id]} />
                   )}
-                  {data.responseTimeMs !== null && (
-                    <span className="text-xs text-muted-foreground">{data.responseTimeMs}ms</span>
-                  )}
-                  {data.error && (
-                    <span className="text-xs text-destructive truncate max-w-48">{data.error}</span>
-                  )}
-                  <span className="text-xs text-muted-foreground ml-auto">
-                    {new Date(data.checkedAt).toLocaleString()}
-                  </span>
                 </div>
               ) : (
                 <p className="text-xs text-muted-foreground">

@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { projects, revenueEntries, timeLogs, integrations, appSettings } from "@/db/schema";
+import { projects, revenueEntries, timeLogs, integrations, appSettings, goals } from "@/db/schema";
 import { desc, eq, sql } from "drizzle-orm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +20,8 @@ import { AiCopilot } from "@/components/dashboard/ai-copilot";
 import { RevenueChart } from "@/components/dashboard/revenue-chart";
 import { TimeChart } from "@/components/dashboard/time-chart";
 import { RevenueSourceChart } from "@/components/dashboard/revenue-source-chart";
+import { Progress } from "@/components/ui/progress";
+import { Target } from "lucide-react";
 
 interface HttpCachedData {
   status: "up" | "down" | "degraded";
@@ -115,6 +117,39 @@ async function getStats() {
     .filter((r) => r.amount > 0)
     .map((r) => ({ source: r.source, amount: r.amount }));
 
+  // Top active goals with auto-computed progress
+  const allGoals = await db.select().from(goals).orderBy(goals.createdAt).limit(6);
+  const som = startOfMonth; // reuse startOfMonth computed above
+
+  const goalsWithProgress = await Promise.all(
+    allGoals.map(async (g) => {
+      let current = 0;
+      if (g.type === "mrr") {
+        const q = g.projectId
+          ? db.select({ v: sql<number>`coalesce(sum(${revenueEntries.amount}),0)` }).from(revenueEntries).where(sql`${revenueEntries.type}='mrr' AND ${revenueEntries.projectId}=${g.projectId}`)
+          : db.select({ v: sql<number>`coalesce(sum(${revenueEntries.amount}),0)` }).from(revenueEntries).where(eq(revenueEntries.type, "mrr"));
+        current = (await q)[0]?.v ?? 0;
+      } else if (g.type === "revenue_month") {
+        const q = g.projectId
+          ? db.select({ v: sql<number>`coalesce(sum(${revenueEntries.amount}),0)` }).from(revenueEntries).where(sql`${revenueEntries.projectId}=${g.projectId} AND ${revenueEntries.recordedAt}>=${som}`)
+          : db.select({ v: sql<number>`coalesce(sum(${revenueEntries.amount}),0)` }).from(revenueEntries).where(sql`${revenueEntries.recordedAt}>=${som}`);
+        current = (await q)[0]?.v ?? 0;
+      } else if (g.type === "time_month") {
+        const q = g.projectId
+          ? db.select({ v: sql<number>`coalesce(sum(${timeLogs.minutes}),0)` }).from(timeLogs).where(sql`${timeLogs.projectId}=${g.projectId} AND ${timeLogs.loggedAt}>=${som}`)
+          : db.select({ v: sql<number>`coalesce(sum(${timeLogs.minutes}),0)` }).from(timeLogs).where(sql`${timeLogs.loggedAt}>=${som}`);
+        current = ((await q)[0]?.v ?? 0) / 60;
+      } else if (g.type === "time_total") {
+        const q = g.projectId
+          ? db.select({ v: sql<number>`coalesce(sum(${timeLogs.minutes}),0)` }).from(timeLogs).where(eq(timeLogs.projectId, g.projectId))
+          : db.select({ v: sql<number>`coalesce(sum(${timeLogs.minutes}),0)` }).from(timeLogs);
+        current = ((await q)[0]?.v ?? 0) / 60;
+      }
+      const pct = g.targetValue > 0 ? Math.min(100, Math.round((current / g.targetValue) * 100)) : 0;
+      return { ...g, currentValue: current, pct };
+    })
+  );
+
   return {
     projects: allProjects,
     totalProjects: allProjects.length,
@@ -126,6 +161,7 @@ async function getStats() {
     revenueChartData,
     timeChartData,
     revenueSourceData,
+    goalsWithProgress,
   };
 }
 
@@ -139,7 +175,7 @@ const statusVariant = {
 export default async function DashboardPage() {
   const t = await getTranslations("overview");
   const tp = await getTranslations("projects");
-  const { projects: allProjects, totalProjects, activeCount, totalMRR, monthlyMinutes, probesSummary, hasOpenAiKey, revenueChartData, timeChartData, revenueSourceData } = await getStats();
+  const { projects: allProjects, totalProjects, activeCount, totalMRR, monthlyMinutes, probesSummary, hasOpenAiKey, revenueChartData, timeChartData, revenueSourceData, goalsWithProgress } = await getStats();
   const recentProjects = allProjects.slice(0, 5);
   const upCount = probesSummary.filter((p) => p.status === "up").length;
   const downCount = probesSummary.filter((p) => p.status === "down" || p.status === "degraded").length;
@@ -236,6 +272,34 @@ export default async function DashboardPage() {
             </Card>
           )}
         </div>
+      )}
+
+      {/* Goals widget */}
+      {goalsWithProgress.length > 0 && (
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Target className="h-4 w-4" />
+              {t("goals.title")}
+            </CardTitle>
+            <Link href="/goals" className="text-xs text-primary hover:underline">
+              {t("viewAll")}
+            </Link>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {goalsWithProgress.slice(0, 4).map((g) => (
+              <div key={g.id} className="space-y-1.5">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium">{g.title}</span>
+                  <span className={`text-xs font-semibold ${g.pct >= 100 ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground"}`}>
+                    {g.pct}%
+                  </span>
+                </div>
+                <Progress value={g.pct} className={`h-1.5 ${g.pct >= 100 ? "[&>div]:bg-emerald-500" : ""}`} />
+              </div>
+            ))}
+          </CardContent>
+        </Card>
       )}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
