@@ -38,6 +38,16 @@
     "noProjects": "No projects yet",
     "noProjectsDesc": "Add your first project to start tracking status, revenue, and time investment.",
     "backToProjects": "← Back to Projects",
+    "share": {
+      "create": "Share",
+      "manage": "Share link",
+      "generating": "Generating...",
+      "publicLink": "Public share link",
+      "desc": "Anyone with this link can view the project's public page (revenue, time, status).",
+      "preview": "Preview",
+      "revoke": "Revoke link",
+      "revokeConfirm": "Revoke this share link? The current URL will stop working."
+    },
     "notFound": "Project not found",
     "editProject": "Edit Project",
     "deleteProject": "Delete Project",

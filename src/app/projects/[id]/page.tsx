@@ -14,6 +14,7 @@ import { GithubIntegration } from "@/components/dashboard/github-integration";
 import { VercelIntegration } from "@/components/dashboard/vercel-integration";
 import { HttpProbeIntegration } from "@/components/dashboard/http-probe-integration";
 import { StripeIntegration } from "@/components/dashboard/stripe-integration";
+import { ShareButton } from "./share-button";
 
 const statusVariant = {
   active: "success" as const,
@@ -76,7 +77,7 @@ export default async function ProjectDetailPage({
     .limit(5);
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 sm:p-6 space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1">
           <Link href="/projects" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
@@ -93,6 +94,7 @@ export default async function ProjectDetailPage({
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
+          <ShareButton projectId={project.id} currentToken={project.shareToken ?? null} />
           <EditProjectForm project={project} />
           <DeleteProjectButton projectId={project.id} projectName={project.name} />
         </div>

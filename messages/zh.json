@@ -38,6 +38,16 @@
     "noProjects": "暂无项目",
     "noProjectsDesc": "添加你的第一个项目，开始追踪状态、收入与时间投入。",
     "backToProjects": "← 返回项目列表",
+    "share": {
+      "create": "创建分享链接",
+      "manage": "分享链接",
+      "generating": "生成中...",
+      "publicLink": "公开分享链接",
+      "desc": "任何有此链接的人都可以查看该项目的公开信息（收入、时间、状态）。",
+      "preview": "预览页面",
+      "revoke": "撤销链接",
+      "revokeConfirm": "确定撤销分享链接吗？撤销后原链接将失效。"
+    },
     "notFound": "项目不存在",
     "editProject": "编辑项目",
     "deleteProject": "删除项目",

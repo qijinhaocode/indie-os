@@ -13,6 +13,7 @@ export const projects = sqliteTable("projects", {
   repo: text("repo"),
   domain: text("domain"),
   techStack: text("tech_stack"),
+  shareToken: text("share_token"),
   createdAt: text("created_at").default(sql`(datetime('now'))`),
   updatedAt: text("updated_at").default(sql`(datetime('now'))`),
 });

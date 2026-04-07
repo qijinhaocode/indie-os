@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { setLocale } from "@/actions/locale";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 interface NavContentProps {
   onLinkClick?: () => void;
@@ -77,14 +78,17 @@ export function NavContent({ onLinkClick }: NavContentProps) {
       </nav>
 
       <div className="border-t border-border px-2 py-3 space-y-0.5 shrink-0">
-        <button
-          onClick={switchLocale}
-          disabled={isPending}
-          className="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:opacity-50"
-        >
-          <Languages className="h-4 w-4" />
-          {isPending ? "..." : locale === "zh" ? "English" : "中文"}
-        </button>
+        <div className="flex items-center gap-1 px-1">
+          <button
+            onClick={switchLocale}
+            disabled={isPending}
+            className="flex flex-1 items-center gap-2.5 rounded-md px-2 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground disabled:opacity-50"
+          >
+            <Languages className="h-4 w-4 shrink-0" />
+            {isPending ? "..." : locale === "zh" ? "English" : "中文"}
+          </button>
+          <ThemeToggle className="flex items-center justify-center h-8 w-8 rounded-md text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors shrink-0" />
+        </div>
         <Link
           href="/settings"
           onClick={onLinkClick}

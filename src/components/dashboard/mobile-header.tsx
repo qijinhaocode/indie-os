@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { Menu, X, Zap } from "lucide-react";
 import { NavContent } from "./nav-content";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export function MobileHeader() {
   const [open, setOpen] = useState(false);
@@ -36,13 +37,16 @@ export function MobileHeader() {
           </div>
           <span className="font-semibold text-sm tracking-tight">indie-os</span>
         </div>
-        <button
-          onClick={() => setOpen(true)}
-          className="flex items-center justify-center h-8 w-8 rounded-md text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
-          aria-label="Open menu"
-        >
-          <Menu className="h-5 w-5" />
-        </button>
+        <div className="flex items-center gap-1">
+          <ThemeToggle className="flex items-center justify-center h-8 w-8 rounded-md text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors" />
+          <button
+            onClick={() => setOpen(true)}
+            className="flex items-center justify-center h-8 w-8 rounded-md text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+            aria-label="Open menu"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+        </div>
       </header>
 
       {/* Overlay */}
