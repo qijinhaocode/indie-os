@@ -109,16 +109,37 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000). That's it — no environment variables required to get started.
 
-### Production
+### Production (Node.js)
 
 ```bash
 npm run build
 npm run start
 ```
 
-For persistent hosting, deploy on any VPS (DigitalOcean, Hetzner, etc.) or run locally. The SQLite database file (`indie-os.db`) stays on your machine.
+### 🐳 Production (Docker) — Recommended for VPS
 
-> **Note:** indie-os uses SQLite and is designed for **single-user, self-hosted** deployment. It's not compatible with serverless platforms like Vercel (no persistent filesystem).
+The easiest way to self-host on any VPS (DigitalOcean, Hetzner, Contabo, etc.):
+
+```bash
+# 1. Clone
+git clone https://github.com/qijinhaocode/indie-os.git
+cd indie-os
+
+# 2. Build and start (database persists in ./data/)
+docker compose up -d
+
+# 3. Open http://your-server-ip:3000
+```
+
+**To update:**
+```bash
+git pull
+docker compose up -d --build
+```
+
+The SQLite database is stored in `./data/indie-os.db` on your host — just back up that directory.
+
+> **Note:** indie-os is designed for **single-user, self-hosted** deployment. Not compatible with serverless platforms like Vercel (no persistent filesystem).
 
 ---
 
@@ -241,12 +262,16 @@ messages/
 - [x] Public status page
 - [x] Revenue + time charts
 
-### 🔜 Phase 4: Ecosystem
+### ✅ Phase 4: Ops & Delivery (Done)
+- [x] Docker Compose deployment (one-command VPS deploy)
+- [x] Weekly email digest (Resend)
+- [x] `DATABASE_URL` environment variable support
+
+### 🔜 Phase 5: Ecosystem
 - [ ] RevenueCat integration (App Store / Play Store MRR)
 - [ ] Paddle integration
-- [ ] Docker Compose deployment guide
 - [ ] Plugin system for custom integrations
-- [ ] Email digest (weekly summary)
+- [ ] Multi-user support with auth
 
 ---
 

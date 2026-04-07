@@ -1,0 +1,26 @@
+# Dependencies
+node_modules
+npm-debug.log*
+
+# Build output
+.next
+
+# Database (mounted as volume at runtime)
+*.db
+*.db-shm
+*.db-wal
+data/
+
+# Dev files
+.env
+.env.*
+drizzle/
+
+# Git
+.git
+.gitignore
+
+# Misc
+.DS_Store
+*.log
+README.md

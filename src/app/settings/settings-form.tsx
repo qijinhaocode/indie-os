@@ -23,6 +23,10 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
   const [webhookUrl, setWebhookUrl] = useState("");
   const [telegramBotToken, setTelegramBotToken] = useState("");
   const [telegramChatId, setTelegramChatId] = useState("");
+  const [resendApiKey, setResendApiKey] = useState("");
+  const [digestEmail, setDigestEmail] = useState("");
+  const [sendingDigest, setSendingDigest] = useState(false);
+  const [digestResult, setDigestResult] = useState<"sent" | "error" | null>(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [cronSecret, setCronSecret] = useState<string | null>(null);
@@ -102,6 +106,8 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
     if (webhookUrl) body["notify_webhook_url"] = webhookUrl;
     if (telegramBotToken) body["notify_telegram_token"] = telegramBotToken;
     if (telegramChatId) body["notify_telegram_chat_id"] = telegramChatId;
+    if (resendApiKey) body["resend_api_key"] = resendApiKey;
+    if (digestEmail) body["digest_email"] = digestEmail;
 
     if (Object.keys(body).length === 0) {
       setSaving(false);
@@ -123,11 +129,27 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
     setWebhookUrl("");
     setTelegramBotToken("");
     setTelegramChatId("");
+    setResendApiKey("");
+    setDigestEmail("");
     setTimeout(() => setSaved(false), 3000);
     router.refresh();
   }
 
-  const hasChanges = !!(githubToken || vercelToken || stripeSecretKey || openaiApiKey || webhookUrl || telegramBotToken || telegramChatId);
+  const hasChanges = !!(githubToken || vercelToken || stripeSecretKey || openaiApiKey || webhookUrl || telegramBotToken || telegramChatId || resendApiKey || digestEmail);
+
+  async function handleSendDigest() {
+    setSendingDigest(true);
+    setDigestResult(null);
+    try {
+      const res = await fetch("/api/digest", { method: "POST" });
+      setDigestResult(res.ok ? "sent" : "error");
+    } catch {
+      setDigestResult("error");
+    } finally {
+      setSendingDigest(false);
+      setTimeout(() => setDigestResult(null), 4000);
+    }
+  }
 
   return (
     <div className="space-y-4">
@@ -266,6 +288,53 @@ export function SettingsForm({ savedKeys }: SettingsFormProps) {
           <Button onClick={handleSave} disabled={saving || !hasChanges}>
             {saved ? t("saved") : saving ? t("saving") : t("save")}
           </Button>
+        </CardContent>
+      </Card>
+
+      {/* Email Digest */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">{t("digest.title")}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-muted-foreground">{t("digest.desc")}</p>
+
+          <div className="space-y-2">
+            <Label htmlFor="resend-key" className="flex items-center gap-2">
+              {t("digest.resendKey")}
+              {savedKeys["resend_api_key"] && <CheckCircle className="h-3.5 w-3.5 text-emerald-500" />}
+            </Label>
+            <div className="flex gap-2">
+              <Input id="resend-key" type="password" value={resendApiKey}
+                onChange={(e) => setResendApiKey(e.target.value)}
+                placeholder={savedKeys["resend_api_key"] ? "••••••••" : "re_xxxxxxxx"} />
+              <a href="https://resend.com/api-keys" target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 shrink-0 text-xs text-primary hover:underline border border-border rounded-md px-2">
+                {t("createToken")} <ExternalLink className="h-3 w-3" />
+              </a>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="digest-email" className="flex items-center gap-2">
+              {t("digest.toEmail")}
+              {savedKeys["digest_email"] && <CheckCircle className="h-3.5 w-3.5 text-emerald-500" />}
+            </Label>
+            <Input id="digest-email" type="email" value={digestEmail}
+              onChange={(e) => setDigestEmail(e.target.value)}
+              placeholder={savedKeys["digest_email"] ? "••••••••" : "you@example.com"} />
+          </div>
+
+          <div className="flex gap-3 flex-wrap">
+            <Button onClick={handleSave} disabled={saving || !hasChanges}>
+              {saved ? t("saved") : saving ? t("saving") : t("save")}
+            </Button>
+            <Button variant="outline" onClick={handleSendDigest}
+              disabled={sendingDigest || (!savedKeys["resend_api_key"] && !resendApiKey) || (!savedKeys["digest_email"] && !digestEmail)}>
+              {sendingDigest ? t("digest.sending") : digestResult === "sent" ? t("digest.sent") : digestResult === "error" ? t("digest.error") : t("digest.sendNow")}
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground">{t("digest.cronTip")}</p>
         </CardContent>
       </Card>
 

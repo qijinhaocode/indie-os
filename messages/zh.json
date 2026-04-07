@@ -177,6 +177,17 @@
     "vercelTokenDesc": "用于拉取部署状态和项目信息。",
     "vercelTokenPlaceholder": "xxxxxxxxxxxxxxxxxxxxxxxx",
     "exportBackup": "导出全量备份",
+    "digest": {
+      "title": "周报邮件 (Email Digest)",
+      "desc": "每周自动发送收入、时间、服务状态摘要到你的邮箱。使用 Resend 发送，免费额度 3000 封/月。",
+      "resendKey": "Resend API Key",
+      "toEmail": "接收邮箱",
+      "sendNow": "立即发送测试",
+      "sending": "发送中...",
+      "sent": "✓ 已发送",
+      "error": "发送失败",
+      "cronTip": "可将 POST /api/digest 加入 Cron 每周自动触发（例如每周一 08:00）。"
+    },
     "notify": {
       "title": "下线通知",
       "desc": "当 HTTP 探针检测到服务不可达时，自动推送通知。支持 Slack、Discord、Telegram 等。",

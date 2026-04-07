@@ -177,6 +177,17 @@
     "vercelTokenDesc": "Used to fetch deployment status and project info.",
     "vercelTokenPlaceholder": "xxxxxxxxxxxxxxxxxxxxxxxx",
     "exportBackup": "Export Full Backup",
+    "digest": {
+      "title": "Weekly Email Digest",
+      "desc": "Automatically send a weekly revenue, time, and service health summary to your inbox. Uses Resend — free tier is 3,000 emails/month.",
+      "resendKey": "Resend API Key",
+      "toEmail": "Recipient Email",
+      "sendNow": "Send Test Now",
+      "sending": "Sending...",
+      "sent": "✓ Sent",
+      "error": "Send Failed",
+      "cronTip": "Add POST /api/digest to your cron schedule to send automatically (e.g. every Monday at 8:00 AM)."
+    },
     "notify": {
       "title": "Down Alerts",
       "desc": "Get notified when an HTTP probe detects a service is down. Supports Slack, Discord, Telegram, and generic webhooks.",

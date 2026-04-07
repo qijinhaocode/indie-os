@@ -1,0 +1,19 @@
+services:
+  indie-os:
+    build: .
+    container_name: indie-os
+    ports:
+      - "3000:3000"
+    volumes:
+      # SQLite database persists here — back this directory up!
+      - ./data:/app/data
+    environment:
+      - DATABASE_URL=/app/data/indie-os.db
+      - NODE_ENV=production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/stats"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
